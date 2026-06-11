@@ -1,0 +1,57 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", Georgia, Cambria, serif;
+  --font-display: "Space Grotesk", sans-serif;
+
+  --color-brand-primary: #374037;
+  --color-brand-secondary: #4A5948;
+  --color-brand-sage-muted: #748972;
+  --color-brand-sage-light: #BAD1B8;
+  --color-brand-cream: #F4F2E4;
+}
+
+/* Base custom definitions */
+html, body {
+  background-color: var(--color-brand-cream);
+  color: #1a1a1a;
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+/* RTL layout helpers */
+[dir="rtl"] {
+  font-family: "Inter", sans-serif; /* Fallback or specific beautiful bilingual type */
+}
+
+/* Modern custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-brand-cream);
+}
+::-webkit-scrollbar-thumb {
+  background: #748972;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #4A5948;
+}
+
+.glow-effect {
+  box-shadow: 0 0 30px rgba(186, 209, 184, 0.25);
+}
+
+.luxury-card {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.luxury-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px -10px rgba(55, 64, 55, 0.15);
+}
