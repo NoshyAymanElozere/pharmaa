@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from 'react';
 import { useApp } from '../../store/AppContext';
 import { Lock, Mail, User, ShieldCheck, ArrowRight, Chrome, Facebook, Info } from 'lucide-react';
@@ -103,14 +105,14 @@ export default function AuthView() {
   };
 
   return (
-    <div className="max-w-md mx-auto my-12 px-4">
+    <div className="max-w-md mx-auto my-12 px-4 animate-fade-in">
       
       {/* Container Box */}
-      <div className="bg-white rounded-3xl p-8 border border-brand-sage-light/10 shadow-sm space-y-6 font-sans text-xs text-zinc-650">
+      <div className="card-elevated bg-white p-8 !rounded-2xl space-y-6 font-sans text-xs text-brand-sage-muted">
         
         {/* Title Dynamic Header */}
-        <div className="text-center space-y-1.5">
-          <h2 className="font-serif text-xl sm:text-2xl font-bold text-zinc-900 leading-tight">
+        <div className="text-center space-y-2">
+          <h2 className="font-serif text-xl sm:text-2xl font-bold text-brand-primary leading-tight">
             {authMode === 'login' && (language === 'en' ? t.titleLoginEn : t.titleLoginAr)}
             {authMode === 'register' && (language === 'en' ? t.titleRegEn : t.titleRegAr)}
             {authMode === 'forgot' && (language === 'en' ? t.titleForgotEn : t.titleForgotAr)}
@@ -122,10 +124,10 @@ export default function AuthView() {
 
         {/* Notices */}
         {errorMsg && (
-          <p className="p-3 bg-red-50 text-red-700 font-semibold rounded-xl border border-red-100">{errorMsg}</p>
+          <p className="p-3 bg-red-50 text-red-700 font-semibold rounded-xl border border-red-100 animate-fade-up">{errorMsg}</p>
         )}
         {successMsg && (
-          <div className="p-3 bg-emerald-50 text-emerald-800 font-bold rounded-xl border border-emerald-100 flex items-center gap-1.5">
+          <div className="p-3 bg-emerald-50 text-emerald-850 font-bold rounded-xl border border-emerald-100 flex items-center gap-1.5 animate-fade-up">
             <ShieldCheck size={14} className="text-emerald-600" />
             <span>{successMsg}</span>
           </div>
@@ -134,8 +136,8 @@ export default function AuthView() {
         {/* LOGIN FORM */}
         {authMode === 'login' && (
           <form onSubmit={handleLoginSubmit} className="space-y-4">
-            <div className="space-y-1">
-              <label className="text-[9px] uppercase tracking-widest font-bold text-zinc-400 block">{language === 'en' ? t.labelEmailEn : t.labelEmailAr}</label>
+            <div className="space-y-1.5">
+              <label className="input-label">{language === 'en' ? t.labelEmailEn : t.labelEmailAr}</label>
               <div className="relative">
                 <input
                   type="email"
@@ -143,14 +145,14 @@ export default function AuthView() {
                   placeholder="name@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-zinc-50 border border-zinc-250 focus:border-brand-primary focus:outline-none rounded-xl py-3 pl-10 pr-4 rtl:pr-10 rtl:pl-4 text-zinc-800 font-mono shadow-inner"
+                  className="input-field !pl-10 rtl:!pr-10 rtl:!pl-4"
                 />
-                <Mail className="absolute left-3.5 rtl:right-3.5 top-1/2 -translate-y-1/2 text-zinc-400" size={14} />
+                <Mail className="absolute left-3.5 rtl:right-3.5 top-1/2 -translate-y-1/2 text-brand-sage-muted" size={14} />
               </div>
             </div>
 
-            <div className="space-y-1">
-              <label className="text-[9px] uppercase tracking-widest font-bold text-zinc-400 block">{language === 'en' ? 'Passphrase' : 'كلمة المرور'}</label>
+            <div className="space-y-1.5">
+              <label className="input-label">{language === 'en' ? 'Passphrase' : 'كلمة المرور'}</label>
               <div className="relative">
                 <input
                   type="password"
@@ -158,15 +160,15 @@ export default function AuthView() {
                   placeholder={language === 'en' ? t.placeholderPassEn : t.placeholderPassAr}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-zinc-50 border border-zinc-250 focus:border-brand-primary focus:outline-none rounded-xl py-3 pl-10 pr-4 rtl:pr-10 rtl:pl-4 text-zinc-805 shadow-inner"
+                  className="input-field !pl-10 rtl:!pr-10 rtl:!pl-4"
                 />
-                <Lock className="absolute left-3.5 rtl:right-3.5 top-1/2 -translate-y-1/2 text-zinc-400" size={14} />
+                <Lock className="absolute left-3.5 rtl:right-3.5 top-1/2 -translate-y-1/2 text-brand-sage-muted" size={14} />
               </div>
 
               <button
                 type="button"
                 onClick={() => setAuthMode('forgot')}
-                className="text-[10px] text-zinc-400 hover:text-brand-primary hover:underline font-semibold block pt-1.5 cursor-pointer"
+                className="text-[10px] text-zinc-400 hover:text-brand-primary hover:underline font-semibold block pt-1 cursor-pointer transition-colors"
               >
                 {language === 'en' ? t.forgotLinkEn : t.forgotLinkAr}
               </button>
@@ -174,7 +176,7 @@ export default function AuthView() {
 
             <button
               type="submit"
-              className="w-full bg-brand-primary hover:bg-brand-secondary text-brand-cream py-4 rounded-xl text-xs uppercase tracking-widest font-bold text-center transition-theme cursor-pointer"
+              className="btn-primary w-full !py-3.5"
             >
               {language === 'en' ? t.loginBtnEn : t.loginBtnAr}
             </button>
@@ -184,8 +186,8 @@ export default function AuthView() {
         {/* REGISTER FORM */}
         {authMode === 'register' && (
           <form onSubmit={handleRegisterSubmit} className="space-y-4">
-            <div className="space-y-1">
-              <label className="text-[9px] uppercase tracking-widest font-bold text-zinc-400 block">{language === 'en' ? t.labelNameEn : t.labelNameAr}</label>
+            <div className="space-y-1.5">
+              <label className="input-label">{language === 'en' ? t.labelNameEn : t.labelNameAr}</label>
               <div className="relative">
                 <input
                   type="text"
@@ -193,14 +195,14 @@ export default function AuthView() {
                   placeholder="Sarah"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-zinc-50 border border-zinc-250 focus:border-brand-primary focus:outline-none rounded-xl py-3 pl-10 pr-4 rtl:pr-10 rtl:pl-4 text-zinc-800 shadow-inner"
+                  className="input-field !pl-10 rtl:!pr-10 rtl:!pl-4"
                 />
-                <User className="absolute left-3.5 rtl:right-3.5 top-1/2 -translate-y-1/2 text-zinc-400" size={14} />
+                <User className="absolute left-3.5 rtl:right-3.5 top-1/2 -translate-y-1/2 text-brand-sage-muted" size={14} />
               </div>
             </div>
 
-            <div className="space-y-1">
-              <label className="text-[9px] uppercase tracking-widest font-bold text-zinc-400 block">{language === 'en' ? t.labelEmailEn : t.labelEmailAr}</label>
+            <div className="space-y-1.5">
+              <label className="input-label">{language === 'en' ? t.labelEmailEn : t.labelEmailAr}</label>
               <div className="relative">
                 <input
                   type="email"
@@ -208,27 +210,27 @@ export default function AuthView() {
                   placeholder="client@aura.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-zinc-50 border border-zinc-250 focus:border-brand-primary focus:outline-none rounded-xl py-3 pl-10 pr-4 rtl:pr-10 rtl:pl-4 text-zinc-800 font-mono shadow-inner"
+                  className="input-field !pl-10 rtl:!pr-10 rtl:!pl-4"
                 />
-                <Mail className="absolute left-3.5 rtl:right-3.5 top-1/2 -translate-y-1/2 text-zinc-400" size={14} />
+                <Mail className="absolute left-3.5 rtl:right-3.5 top-1/2 -translate-y-1/2 text-brand-sage-muted" size={14} />
               </div>
             </div>
 
-            <div className="space-y-1">
-              <label className="text-[9px] uppercase tracking-widest font-bold text-zinc-400 block">{language === 'en' ? t.labelPhoneEn : t.labelPhoneAr}</label>
+            <div className="space-y-1.5">
+              <label className="input-label">{language === 'en' ? t.labelPhoneEn : t.labelPhoneAr}</label>
               <input
                 type="tel"
                 required
                 placeholder="+966 5x xxx xxxx"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="w-full bg-zinc-50 border border-zinc-250 focus:border-brand-primary focus:outline-none rounded-xl py-3 px-4 text-zinc-850 shadow-inner"
+                className="input-field"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full bg-brand-primary hover:bg-brand-secondary text-brand-cream py-4 rounded-xl text-xs uppercase tracking-widest font-bold text-center transition-theme cursor-pointer"
+              className="btn-primary w-full !py-3.5"
             >
               {language === 'en' ? t.registerBtnEn : t.registerBtnAr}
             </button>
@@ -238,21 +240,21 @@ export default function AuthView() {
         {/* FORGOT PASSWORD FORM */}
         {authMode === 'forgot' && (
           <form onSubmit={handleForgotSubmit} className="space-y-4">
-            <div className="space-y-1">
-              <label className="text-[9px] uppercase tracking-widest font-bold text-zinc-400 block">{language === 'en' ? t.labelEmailEn : t.labelEmailAr}</label>
+            <div className="space-y-1.5">
+              <label className="input-label">{language === 'en' ? t.labelEmailEn : t.labelEmailAr}</label>
               <input
                 type="email"
                 required
                 placeholder="name@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-zinc-50 border border-zinc-250 focus:border-brand-primary focus:outline-none rounded-xl py-3 px-4 shadow-inner text-zinc-800"
+                className="input-field"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full bg-brand-primary hover:bg-brand-secondary text-brand-cream py-4 rounded-xl text-xs uppercase tracking-widest font-bold text-center transition-theme cursor-pointer"
+              className="btn-primary w-full !py-3.5"
             >
               {language === 'en' ? t.forgotTitleBtnEn : t.forgotTitleBtnAr}
             </button>
@@ -260,7 +262,7 @@ export default function AuthView() {
             <button
               type="button"
               onClick={() => setAuthMode('login')}
-              className="text-xs text-center font-semibold text-zinc-500 hover:text-brand-primary block w-full pt-1.5 cursor-pointer"
+              className="text-xs text-center font-semibold text-brand-sage-muted hover:text-brand-primary block w-full pt-1 cursor-pointer transition-colors"
             >
               {language === 'en' ? t.backLinkEn : t.backLinkAr}
             </button>
@@ -271,21 +273,21 @@ export default function AuthView() {
         {authMode !== 'forgot' && (
           <div className="text-center pt-2">
             {authMode === 'login' ? (
-              <p className="text-zinc-500 font-sans text-[11px]">
+              <p className="text-zinc-400 font-sans text-[11px]">
                 {language === 'en' ? t.noAccountEn : t.noAccountAr}
                 <button
                   onClick={() => setAuthMode('register')}
-                  className="font-bold text-brand-primary hover:underline cursor-pointer"
+                  className="font-bold text-brand-primary hover:underline cursor-pointer transition-colors ml-1 rtl:mr-1"
                 >
                   {language === 'en' ? t.createAccountEn : t.createAccountAr}
                 </button>
               </p>
             ) : (
-              <p className="text-zinc-500 font-sans text-[11px]">
+              <p className="text-zinc-400 font-sans text-[11px]">
                 {language === 'en' ? t.hasAccountEn : t.hasAccountAr}
                 <button
                   onClick={() => setAuthMode('login')}
-                  className="font-bold text-brand-primary hover:underline cursor-pointer"
+                  className="font-bold text-brand-primary hover:underline cursor-pointer transition-colors ml-1 rtl:mr-1"
                 >
                   {language === 'en' ? t.signInLinkEn : t.signInLinkAr}
                 </button>
@@ -295,8 +297,8 @@ export default function AuthView() {
         )}
 
         {/* SOCIAL AUTH BUTTONS BAR */}
-        <div className="pt-6 border-t border-zinc-100 space-y-3">
-          <span className="block text-center text-[10px] text-zinc-400 uppercase font-semibold tracking-wider font-sans">
+        <div className="pt-6 border-t border-brand-sage-light/10 space-y-3">
+          <span className="block text-center text-[10px] text-brand-sage-muted uppercase font-bold tracking-wider font-sans">
             {language === 'en' ? t.socialHeaderEn : t.socialHeaderAr}
           </span>
 
@@ -308,7 +310,7 @@ export default function AuthView() {
                 setSuccessMsg('Authenticated smoothly via Google security context!');
                 setTimeout(() => setActivePage('profile'), 1200);
               }}
-              className="bg-white hover:bg-zinc-50 text-zinc-700 border border-zinc-200 py-3.5 px-4 rounded-xl font-bold flex items-center justify-center space-x-2.5 rtl:space-x-reverse cursor-pointer transition-colors"
+              className="bg-brand-cream/35 hover:bg-brand-cream/65 text-brand-primary border border-brand-sage-light/15 py-3 px-4 rounded-xl font-bold flex items-center justify-center space-x-2 rtl:space-x-reverse cursor-pointer transition-all duration-300"
             >
               <Chrome size={14} className="text-red-500" />
               <span className="font-sans text-[10px]">Google</span>
@@ -320,7 +322,7 @@ export default function AuthView() {
                 setSuccessMsg('Authenticated smoothly via Facebook security context!');
                 setTimeout(() => setActivePage('profile'), 1200);
               }}
-              className="bg-white hover:bg-zinc-50 text-zinc-700 border border-zinc-200 py-3.5 px-4 rounded-xl font-bold flex items-center justify-center space-x-2.5 rtl:space-x-reverse cursor-pointer transition-colors"
+              className="bg-brand-cream/35 hover:bg-brand-cream/65 text-brand-primary border border-brand-sage-light/15 py-3 px-4 rounded-xl font-bold flex items-center justify-center space-x-2 rtl:space-x-reverse cursor-pointer transition-all duration-300"
             >
               <Facebook size={14} className="text-blue-600" />
               <span className="font-sans text-[10px]">Facebook</span>

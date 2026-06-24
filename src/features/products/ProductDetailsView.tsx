@@ -1,19 +1,194 @@
+"use client";
+
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../store/AppContext';
-import { PRODUCTS } from '../../constants/data';
+import { PRODUCTS, BUNDLES } from '../../constants/data';
 import { Star, Heart, Plus, Minus, ShieldCheck, HelpCircle, ArrowRight, CornerDownLeft, Sparkles, Check, Info } from 'lucide-react';
 import { Product } from '../../types';
+import ProductCard from '../../components/shared/ProductCard';
+import SectionTitle from '../../components/shared/SectionTitle';
 
 export default function ProductDetailsView() {
   const {
     language,
     selectedProduct,
     setSelectedProduct,
+    selectedBundle,
+    setSelectedBundle,
     addToCart,
     wishlist,
     toggleWishlist,
     setActivePage
   } = useApp();
+
+  // If a bundle is selected, show the premium Bundle details section
+  if (selectedBundle) {
+    const b = selectedBundle;
+    const isWished = wishlist.includes(b.id);
+    
+    const handleAddEntireBundle = () => {
+      b.items.forEach((item) => {
+        addToCart(item.product, item.product.size, 1);
+      });
+      setActivePage('cart');
+    };
+
+    const savings = b.originalPrice - b.bundlePrice;
+
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-16 animate-fade-in">
+        
+        {/* Breadcrumb Navigation */}
+        <div className="flex items-center gap-1.5 text-[10px] tracking-widest font-semibold text-brand-sage-muted uppercase">
+          <button onClick={() => setActivePage('home')} className="hover:text-brand-primary transition-colors cursor-pointer">
+            {language === 'en' ? 'Home' : 'الرئيسية'}
+          </button>
+          <span className="text-brand-sage-light">/</span>
+          <span className="text-brand-primary">{language === 'en' ? b.nameEn : b.nameAr}</span>
+        </div>
+
+        {/* Hero Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          {/* Bundle Banner Image */}
+          <div className="lg:col-span-6 relative rounded-3xl overflow-hidden shadow-lg border border-brand-sage-light/20 bg-brand-cream/35 p-2 h-[320px] sm:h-[420px] lg:h-[480px]">
+            <img
+              src={b.image}
+              alt={b.nameEn}
+              className="w-full h-full object-cover rounded-2xl animate-fade-in"
+            />
+            <div className="absolute top-6 left-6 bg-red-650 text-white text-[10px] uppercase font-bold tracking-widest px-3 py-1.5 rounded-full shadow-md">
+              {language === 'en' ? `${b.discountPercentage}% Bundle Saving` : `خصم باقة ${b.discountPercentage}%`}
+            </div>
+          </div>
+
+          {/* Bundle Info */}
+          <div className="lg:col-span-6 space-y-6">
+            <div className="space-y-3">
+              <span className="badge badge-primary">
+                {language === 'en' ? 'Curated Skincare Routine' : 'روتين عناية متكامل'}
+              </span>
+              <h1 className="font-serif text-3xl sm:text-4xl font-bold text-brand-primary leading-tight tracking-tight">
+                {language === 'en' ? b.nameEn : b.nameAr}
+              </h1>
+              <p className="text-zinc-650 text-sm font-sans italic leading-relaxed">
+                {language === 'en' ? b.subtitleEn : b.subtitleAr}
+              </p>
+            </div>
+
+            <p className="text-zinc-650 text-xs sm:text-sm font-sans leading-relaxed">
+              {language === 'en' ? b.descriptionEn : b.descriptionAr}
+            </p>
+
+            {/* Core Routine Benefits */}
+            <div className="space-y-3 pt-2">
+              <h4 className="input-label">
+                {language === 'en' ? 'Routine Outcomes:' : 'نتائج الروتين المتوقعة:'}
+              </h4>
+              <ul className="grid grid-cols-1 gap-2 font-sans">
+                {(language === 'en' ? b.benefitsEn : b.benefitsAr).map((benefit, idx) => (
+                  <li key={idx} className="flex items-start text-xs text-zinc-700 leading-relaxed">
+                    <span className="w-5 h-5 rounded-full bg-brand-sage-light/25 flex items-center justify-center mr-2.5 rtl:ml-2.5 flex-shrink-0 mt-0.5">
+                      <Check className="text-brand-primary" size={11} />
+                    </span>
+                    <span>{benefit}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Pricing Summary Card */}
+            <div className="bg-gradient-to-r from-brand-cream/80 to-brand-sage-light/10 p-6 rounded-2xl border border-brand-sage-light/20 space-y-4">
+              <div className="flex justify-between items-center">
+                <div>
+                  <span className="input-label !mb-1">{language === 'en' ? 'Individual Value' : 'القيمة منفردة'}</span>
+                  <span className="text-zinc-400 line-through text-sm font-semibold font-sans">{b.originalPrice} {language === 'en' ? 'AED/SAR' : 'ريال'}</span>
+                </div>
+                <div className="text-right">
+                  <span className="input-label !mb-1 text-emerald-700 font-bold">{language === 'en' ? 'Bundle Price' : 'سعر الباقة الكلي'}</span>
+                  <span className="text-brand-primary text-2xl font-bold font-sans">{b.bundlePrice} {language === 'en' ? 'AED/SAR' : 'ريال'}</span>
+                </div>
+              </div>
+              <div className="flex justify-between items-center pt-2 border-t border-brand-sage-light/20">
+                <span className="text-xs font-semibold text-emerald-700">
+                  {language === 'en' ? `You save ${savings} AED/SAR (${b.discountPercentage}% off)` : `توفير إضافي بقيمة ${savings} ريال (${b.discountPercentage}٪ خصم)`}
+                </span>
+                <span className="text-[10px] text-zinc-500 font-sans">
+                  {language === 'en' ? 'Free Insulated Shipping' : 'شحن حراري مبرد مجاني'}
+                </span>
+              </div>
+              <button
+                onClick={handleAddEntireBundle}
+                className="w-full btn-primary !py-4 !rounded-xl text-center flex items-center justify-center gap-2 cursor-pointer shadow-md hover:scale-[1.01] active:scale-[0.99]"
+              >
+                <Sparkles size={16} className="animate-pulse" />
+                <span>{language === 'en' ? 'Add Entire Routine Bundle' : 'أضيفي الباقة الكاملة للحقيبة'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Curated Steps Breakdown */}
+        <div className="space-y-8 pt-8">
+          <SectionTitle
+            subtitle={language === 'en' ? 'Step-by-Step Synergy' : 'خطوات الروتين المتكاملة'}
+            title={language === 'en' ? 'The Ritual Steps' : 'طقوس استخدام المجموعة'}
+            description={language === 'en' ? 'How these formulations coordinate to maximize therapeutic results.' : 'كيف تتكامل هذه المستحضرات معاً لضمان أفضل تغذية وحماية للبشرة.'}
+          />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            {b.items.map((item, idx) => {
+              const p = item.product;
+              return (
+                <div key={p.id} className="card-elevated p-6 !rounded-2xl border border-brand-sage-light/10 space-y-4 flex flex-col justify-between">
+                  <div className="space-y-4">
+                    {/* Step tag */}
+                    <div className="flex justify-between items-center">
+                      <span className="badge badge-sage">
+                        {language === 'en' ? item.stepEn : item.stepAr}
+                      </span>
+                      <span className="text-[10px] text-zinc-400 font-sans">{p.size}</span>
+                    </div>
+
+                    {/* Product Image and Details */}
+                    <div className="flex space-x-3.5 rtl:space-x-reverse items-center pt-2">
+                      <img
+                        src={p.image}
+                        alt={p.nameEn}
+                        className="w-16 h-20 object-cover rounded-xl bg-brand-cream/50 p-0.5 border border-brand-sage-light/15"
+                      />
+                      <div>
+                        <h4 className="font-serif text-xs font-bold text-zinc-900 leading-snug">
+                          {language === 'en' ? p.nameEn : p.nameAr}
+                        </h4>
+                        <span className="text-[10px] text-zinc-500 font-sans">{p.discountPrice ?? p.price} {language === 'en' ? 'AED/SAR' : 'ريال'}</span>
+                      </div>
+                    </div>
+
+                    <p className="text-[11px] text-zinc-500 font-sans leading-relaxed">
+                      {language === 'en' ? item.benefitEn : item.benefitAr}
+                    </p>
+                  </div>
+
+                  <div className="pt-3 border-t border-zinc-100 flex items-center justify-between">
+                    <button
+                      onClick={() => setSelectedProduct(p)}
+                      className="text-[10px] text-brand-primary hover:underline font-bold uppercase tracking-wider cursor-pointer font-sans"
+                    >
+                      {language === 'en' ? 'View Formulation' : 'تفاصيل المستحضر'}
+                    </button>
+                    <span className="text-[9px] text-emerald-600 font-bold uppercase tracking-widest font-sans">
+                      {language === 'en' ? 'In Stock' : 'متوفر'}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+      </div>
+    );
+  }
 
   // Guard if no product selected
   if (!selectedProduct) {
@@ -38,6 +213,8 @@ export default function ProductDetailsView() {
   // Frequently bought together states
   const bundleMatch1 = PRODUCTS.find((p) => p.id !== selectedProduct.id && p.categorySlug === 'serums') || PRODUCTS[0];
   const bundleMatch2 = PRODUCTS.find((p) => p.id !== selectedProduct.id && p.id !== bundleMatch1.id && p.categorySlug === 'moisturizers') || PRODUCTS[1];
+
+  const matchingBundle = BUNDLES.find(b => b.items.some(item => item.product.id === selectedProduct.id)) || BUNDLES[0];
 
   const [buyMatch1, setBuyMatch1] = useState(true);
   const [buyMatch2, setBuyMatch2] = useState(false);
@@ -122,19 +299,19 @@ export default function ProductDetailsView() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-16">
       
       {/* Product Card Upper Half: Gallery + Info Details */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 bg-white p-6 sm:p-10 rounded-3xl border border-brand-sage-light/10 shadow-sm">
+      <div className="card-elevated grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 p-5 sm:p-8 lg:p-10 !rounded-2xl">
         
         {/* LEFT COMPONENT: GALLERY SYSTEM */}
         <div className="lg:col-span-6 space-y-4 flex flex-col justify-start">
           {/* Large display screen */}
-          <div className="w-full h-[380px] sm:h-[480px] rounded-2xl overflow-hidden bg-zinc-50 border border-brand-sage-light/20 p-2 relative">
+          <div className="img-zoom-container w-full h-[340px] sm:h-[460px] lg:h-[500px] bg-brand-cream/30 border border-brand-sage-light/12 p-1.5 relative !rounded-2xl">
             <img
               src={activeImage}
               alt={selectedProduct.nameEn}
-              className="w-full h-full object-cover rounded-xl transition-all duration-300"
+              className="w-full h-full object-cover rounded-xl"
             />
           </div>
 
@@ -145,11 +322,11 @@ export default function ProductDetailsView() {
                 <button
                   key={idx}
                   onClick={() => setActiveImage(img)}
-                  className={`w-16 h-20 rounded-lg flex-shrink-0 overflow-hidden border-2 p-0.5 bg-white transition-all cursor-pointer ${
-                    activeImage === img ? 'border-brand-primary scale-103' : 'border-zinc-200 hover:border-brand-sage-muted'
+                  className={`w-16 h-20 sm:w-18 sm:h-22 rounded-xl flex-shrink-0 overflow-hidden border-2 p-0.5 bg-white transition-all duration-300 cursor-pointer ${
+                    activeImage === img ? 'border-brand-primary shadow-md scale-105' : 'border-brand-sage-light/20 hover:border-brand-sage-muted hover:shadow-sm'
                   }`}
                 >
-                  <img src={img} alt="Cosmetics thumbnail view" className="w-full h-full object-cover rounded" />
+                  <img src={img} alt="Cosmetics thumbnail view" className="w-full h-full object-cover rounded-lg" />
                 </button>
               ))}
             </div>
@@ -160,12 +337,14 @@ export default function ProductDetailsView() {
         <div className="lg:col-span-6 flex flex-col justify-between space-y-6">
           <div className="space-y-4">
             {/* Category Breadcrumb */}
-            <span className="text-[10px] tracking-widest font-bold text-brand-sage-muted uppercase block">
-              {language === 'en' ? `Collections / ${selectedProduct.categorySlug}` : `مجموعات / ${selectedProduct.categorySlug}`}
-            </span>
+            <div className="flex items-center gap-1.5 text-[10px] tracking-widest font-semibold text-brand-sage-muted uppercase">
+              <button onClick={() => setActivePage('shop')} className="hover:text-brand-primary transition-colors cursor-pointer">{language === 'en' ? 'Collections' : 'مجموعات'}</button>
+              <span className="text-brand-sage-light">/</span>
+              <span className="text-brand-primary">{selectedProduct.categorySlug}</span>
+            </div>
 
             {/* Product Title */}
-            <h1 className="font-serif text-2xl sm:text-3xl font-bold text-zinc-900 leading-tight">
+            <h1 className="font-serif text-2xl sm:text-3xl font-bold text-brand-primary leading-tight tracking-tight">
               {language === 'en' ? selectedProduct.nameEn : selectedProduct.nameAr}
             </h1>
 
@@ -193,9 +372,9 @@ export default function ProductDetailsView() {
             </div>
 
             {/* Price display card */}
-            <div className="bg-brand-cream/50 p-4 rounded-xl border border-brand-sage-light/10 flex items-center justify-between">
+            <div className="bg-gradient-to-r from-brand-cream/60 to-brand-sage-light/10 p-5 rounded-xl border border-brand-sage-light/15 flex items-center justify-between">
               <div>
-                <span className="text-[9px] text-zinc-400 block uppercase font-bold mb-1 font-sans">{language === 'en' ? 'Aura pricing' : 'السعر المعتمد'}</span>
+                <span className="input-label !mb-1.5">{language === 'en' ? 'Aura pricing' : 'السعر المعتمد'}</span>
                 <div className="flex items-baseline space-x-2.5 rtl:space-x-reverse">
                   {hasDiscount ? (
                     <>
@@ -205,7 +384,7 @@ export default function ProductDetailsView() {
                       <span className="text-zinc-400 text-sm line-through font-sans">
                         {selectedProduct.price} {t.aed}
                       </span>
-                      <span className="bg-red-50 text-red-700 text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded font-sans">
+                      <span className="badge badge-sale !text-[9px]">
                         {t.saveEn} {selectedProduct.price - (selectedProduct.discountPrice ?? 0)} {t.aed}
                       </span>
                     </>
@@ -218,30 +397,30 @@ export default function ProductDetailsView() {
               </div>
 
               <div className="text-right">
-                <span className="text-[9px] text-zinc-400 block uppercase font-bold mb-1 font-sans">
+                <span className="input-label !mb-1.5">
                   {language === 'en' ? t.sizeLabelEn : t.sizeLabelAr}
                 </span>
-                <span className="text-xs font-bold text-zinc-800 bg-white border border-brand-sage-light/30 px-3 py-1.5 rounded-lg inline-block font-sans">
+                <span className="text-xs font-bold text-brand-primary bg-white border border-brand-sage-light/20 px-4 py-2 rounded-lg inline-block font-sans shadow-sm">
                   {selectedProduct.size}
                 </span>
               </div>
             </div>
 
             {/* Stock and Temperature compliance tag */}
-            <span className="flex items-center space-x-1.5 rtl:space-x-reverse text-emerald-700 text-[10px] font-bold uppercase tracking-wider font-sans">
-              <span className="w-2 h-2 rounded-full bg-emerald-600 animate-ping" />
+            <span className="flex items-center space-x-2 rtl:space-x-reverse text-emerald-700 text-[10px] font-bold uppercase tracking-wider font-sans">
+              <span className="relative flex h-2.5 w-2.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span></span>
               <span>{language === 'en' ? t.stockInEn : t.stockInAr}</span>
             </span>
 
             {/* Key Clinical Benefits layout */}
             <div className="space-y-2 pt-2">
-              <h4 className="text-[10px] tracking-widest font-bold text-zinc-400 uppercase">
+              <h4 className="input-label">
                 {language === 'en' ? t.benefitsTitleEn : t.benefitsTitleAr}
               </h4>
               <ul className="grid grid-cols-1 gap-1.5 font-sans">
                 {(language === 'en' ? selectedProduct.benefitsEn : selectedProduct.benefitsAr).map((item, idx) => (
-                  <li key={idx} className="flex items-start text-xs text-zinc-700">
-                    <Check className="text-emerald-600 mr-2 rtl:ml-2 flex-shrink-0 mt-0.5" size={14} />
+                  <li key={idx} className="flex items-start text-xs text-zinc-700 leading-relaxed">
+                    <span className="w-5 h-5 rounded-full bg-brand-sage-light/20 flex items-center justify-center mr-2.5 rtl:ml-2.5 flex-shrink-0 mt-0.5"><Check className="text-brand-primary" size={11} /></span>
                     <span>{item}</span>
                   </li>
                 ))}
@@ -250,31 +429,31 @@ export default function ProductDetailsView() {
           </div>
 
           {/* ADD AND ACCELERATED ACTIONS CONTAINER */}
-          <div className="pt-4 border-t border-brand-sage-light/10 space-y-3">
-            <div className="flex space-x-4 rtl:space-x-reverse">
+          <div className="pt-5 border-t border-brand-sage-light/12 space-y-3">
+            <div className="flex space-x-3 rtl:space-x-reverse">
               {/* Counter Step Picker */}
-              <div className="flex items-center border-2 border-brand-sage-light/30 rounded-xl bg-zinc-50 font-sans">
+              <div className="flex items-center border-2 border-brand-sage-light/25 rounded-xl bg-brand-cream/30 font-sans">
                 <button
                   onClick={decrementQty}
-                  className="p-3 text-zinc-500 hover:text-brand-primary cursor-pointer h-full"
+                  className="p-3.5 text-brand-sage-muted hover:text-brand-primary cursor-pointer h-full transition-colors"
                 >
-                  <Minus size={14} />
+                  <Minus size={15} />
                 </button>
-                <span className="px-5 text-sm font-bold text-zinc-900 min-w-[24px] text-center">
+                <span className="px-5 text-sm font-bold text-brand-primary min-w-[28px] text-center select-none">
                   {quantity}
                 </span>
                 <button
                   onClick={incrementQty}
-                  className="p-3 text-zinc-500 hover:text-brand-primary cursor-pointer h-full"
+                  className="p-3.5 text-brand-sage-muted hover:text-brand-primary cursor-pointer h-full transition-colors"
                 >
-                  <Plus size={14} />
+                  <Plus size={15} />
                 </button>
               </div>
 
               {/* Add Routine Bag CTA */}
               <button
                 onClick={() => addToCart(selectedProduct, selectedProduct.size, quantity)}
-                className="flex-1 bg-brand-primary hover:bg-brand-secondary text-brand-cream py-4 rounded-xl text-xs uppercase tracking-widest font-bold text-center transition-theme cursor-pointer"
+                className="btn-primary flex-1 !py-4 !rounded-xl"
               >
                 {language === 'en' ? t.addToBagEn : t.addToBagAr}
               </button>
@@ -285,8 +464,8 @@ export default function ProductDetailsView() {
                   toggleWishlist(selectedProduct.id);
                   setIsWished(!isWished);
                 }}
-                className={`p-4 rounded-xl border cursor-pointer ${
-                  isWished ? 'border-red-200 bg-red-50 text-red-500' : 'border-zinc-200 text-zinc-500 hover:text-brand-primary hover:bg-brand-cream/30'
+                className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
+                  isWished ? 'border-red-200 bg-red-50 text-red-500 shadow-sm' : 'border-brand-sage-light/20 text-brand-sage-muted hover:text-brand-primary hover:border-brand-sage-muted hover:bg-brand-cream/30'
                 }`}
                 aria-label="Wishlist Trigger"
               >
@@ -297,7 +476,7 @@ export default function ProductDetailsView() {
             {/* Buy now direct CTA */}
             <button
               onClick={handleBuyNow}
-              className="w-full bg-brand-cream border border-brand-sage-muted text-brand-primary py-3 rounded-xl text-xs uppercase tracking-widest font-bold text-center hover:bg-brand-primary hover:text-brand-cream transition-all duration-300 cursor-pointer"
+              className="btn-secondary w-full !py-3.5 !rounded-xl"
             >
               {language === 'en' ? t.buyNowEn : t.buyNowAr}
             </button>
@@ -307,10 +486,9 @@ export default function ProductDetailsView() {
 
       </div>
 
-      {/* Product Information Switch Tabs */}
-      <div className="bg-white rounded-3xl p-6 sm:p-10 border border-brand-sage-light/10 shadow-xs">
+      <div className="card-base bg-white p-6 sm:p-10 !rounded-2xl">
         {/* Buttons header */}
-        <div className="flex border-b border-zinc-100 pb-3 gap-6 sm:gap-10 overflow-x-auto scrollbar-none">
+        <div className="flex border-b border-brand-sage-light/10 pb-3 gap-6 sm:gap-10 overflow-x-auto scrollbar-none">
           {[
             { id: 'desc', labelEn: t.descriptionEn, labelAr: t.descriptionAr },
             { id: 'ingredients', labelEn: t.ingredientsEn, labelAr: t.ingredientsAr },
@@ -320,10 +498,10 @@ export default function ProductDetailsView() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`text-xs sm:text-sm font-semibold uppercase tracking-wider pb-3 border-b-2 cursor-pointer transition-all whitespace-nowrap ${
+              className={`text-xs sm:text-sm font-semibold uppercase tracking-wider pb-3 border-b-2 cursor-pointer transition-all duration-300 whitespace-nowrap ${
                 activeTab === tab.id
                   ? 'border-brand-primary text-brand-primary font-bold'
-                  : 'border-transparent text-zinc-400 hover:text-zinc-700'
+                  : 'border-transparent text-zinc-400 hover:text-brand-primary'
               }`}
             >
               {language === 'en' ? tab.labelEn : tab.labelAr}
@@ -380,17 +558,15 @@ export default function ProductDetailsView() {
               </div>
             </div>
           )}
-
           {activeTab === 'shipping' && (
             <div className="space-y-4">
-              <p>{language === 'en' ? t.shippingDescEn : t.shippingDescAr}</p>
-              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-zinc-100 font-sans text-xs">
+              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-brand-sage-light/10 font-sans text-xs">
                 <li className="flex items-center text-zinc-650">
-                  <ShieldCheck className="text-brand-sage-muted mr-2 rtl:ml-2" size={16} />
+                  <span className="w-5 h-5 rounded-full bg-brand-sage-light/10 flex items-center justify-center mr-2.5 rtl:ml-2.5 flex-shrink-0"><ShieldCheck className="text-brand-primary" size={12} /></span>
                   <span>Saudi Arabia Express Deliveries: Riyadh, Jeddah, Dammam (24-48 hours)</span>
                 </li>
                 <li className="flex items-center text-zinc-650">
-                  <ShieldCheck className="text-brand-sage-muted mr-2 rtl:ml-2" size={16} />
+                  <span className="w-5 h-5 rounded-full bg-brand-sage-light/10 flex items-center justify-center mr-2.5 rtl:ml-2.5 flex-shrink-0"><ShieldCheck className="text-brand-primary" size={12} /></span>
                   <span>Emirates Delivery: Dubai, Abu Dhabi, Sharjah (48-72 hours)</span>
                 </li>
               </ul>
@@ -399,8 +575,8 @@ export default function ProductDetailsView() {
         </div>
       </div>
 
-      {/* FREQUENTLY BOUGHT TOGETHER - HIGH-CONVERSION BUNDLE */}
-      <div className="bg-brand-primary text-brand-cream rounded-3xl p-6 sm:p-10 border border-brand-secondary/40 shadow-xl space-y-6">
+      {/* FREQUENTLY BOUGHT TOGETHER - HIGH-CONVERSION BUNDLE (Commented out per user requirements)
+      <div className="bg-brand-primary text-brand-cream rounded-2xl p-6 sm:p-10 border border-brand-secondary/40 shadow-xl space-y-6 animate-fade-in">
         <div>
           <h2 className="font-serif text-2xl font-bold flex items-center">
             <Sparkles className="text-brand-sage-light mr-2.5 rtl:ml-2.5" size={20} />
@@ -411,15 +587,13 @@ export default function ProductDetailsView() {
           </p>
         </div>
 
-        {/* Bundle horizontal layout items selector */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           <div className="lg:col-span-8 flex flex-col md:flex-row items-start md:items-center space-y-6 md:space-y-0 md:space-x-4 rtl:space-x-reverse">
             
-            {/* Cur - Current item */}
-            <div className="flex items-center text-left rtl:text-right bg-brand-secondary/40 p-3 rounded-2xl border border-brand-sage-muted/30 w-full sm:w-max">
+            <div className="flex items-center text-left rtl:text-right bg-brand-secondary/40 p-3.5 rounded-xl border border-brand-sage-muted/30 w-full sm:w-max shadow-sm">
               <label className="flex items-center space-x-3 rtl:space-x-reverse cursor-pointer">
-                <input type="checkbox" disabled checked className="w-4 h-4 accent-brand-sage-light rounded border-none" />
-                <img src={selectedProduct.image} alt="" className="w-12 h-14 object-cover rounded" />
+                <input type="checkbox" disabled checked className="w-4 h-4 accent-brand-sage-light rounded border-none cursor-not-allowed" />
+                <img src={selectedProduct.image} alt="" className="w-12 h-14 object-cover rounded-lg" />
                 <div>
                   <h4 className="font-serif text-[11px] font-bold truncate max-w-[150px]">{language === 'en' ? selectedProduct.nameEn : selectedProduct.nameAr}</h4>
                   <span className="text-[10px] text-brand-sage-light font-sans">{currentPrice} {t.aed}</span>
@@ -429,8 +603,7 @@ export default function ProductDetailsView() {
 
             <span className="text-zinc-400 font-sans text-xl font-bold mx-auto">+</span>
 
-            {/* Match 1 item */}
-            <div className={`flex items-center text-left rtl:text-right p-3 rounded-2xl border transition-all duration-350 w-full sm:w-max ${
+            <div className={`flex items-center text-left rtl:text-right p-3.5 rounded-xl border transition-all duration-350 w-full sm:w-max shadow-sm ${
               buyMatch1 ? 'bg-brand-secondary border-brand-sage-light/40' : 'bg-brand-secondary/15 border-brand-secondary/30 opacity-60'
             }`}>
               <label className="flex items-center space-x-3.5 rtl:space-x-reverse cursor-pointer">
@@ -440,7 +613,7 @@ export default function ProductDetailsView() {
                   onChange={(e) => setBuyMatch1(e.target.checked)}
                   className="w-4 h-4 accent-brand-sage-light rounded border-none"
                 />
-                <img src={bundleMatch1.image} alt="" className="w-12 h-14 object-cover rounded" />
+                <img src={bundleMatch1.image} alt="" className="w-12 h-14 object-cover rounded-lg" />
                 <div>
                   <h4 className="font-serif text-[11px] font-bold truncate max-w-[150px]">{language === 'en' ? bundleMatch1.nameEn : bundleMatch1.nameAr}</h4>
                   <span className="text-[10px] text-brand-sage-light font-sans">{bundleMatch1.discountPrice ?? bundleMatch1.price} {t.aed}</span>
@@ -450,8 +623,7 @@ export default function ProductDetailsView() {
 
             <span className="text-zinc-400 font-sans text-xl font-bold mx-auto">+</span>
 
-            {/* Match 2 item */}
-            <div className={`flex items-center text-left rtl:text-right p-3 rounded-2xl border transition-all duration-350 w-full sm:w-max ${
+            <div className={`flex items-center text-left rtl:text-right p-3.5 rounded-xl border transition-all duration-350 w-full sm:w-max shadow-sm ${
               buyMatch2 ? 'bg-brand-secondary border-brand-sage-light/40' : 'bg-brand-secondary/15 border-brand-secondary/30 opacity-60'
             }`}>
               <label className="flex items-center space-x-3.5 rtl:space-x-reverse cursor-pointer">
@@ -461,7 +633,7 @@ export default function ProductDetailsView() {
                   onChange={(e) => setBuyMatch2(e.target.checked)}
                   className="w-4 h-4 accent-brand-sage-light rounded border-none"
                 />
-                <img src={bundleMatch2.image} alt="" className="w-12 h-14 object-cover rounded" />
+                <img src={bundleMatch2.image} alt="" className="w-12 h-14 object-cover rounded-lg" />
                 <div>
                   <h4 className="font-serif text-[11px] font-bold truncate max-w-[150px]">{language === 'en' ? bundleMatch2.nameEn : bundleMatch2.nameAr}</h4>
                   <span className="text-[10px] text-brand-sage-light font-sans">{bundleMatch2.discountPrice ?? bundleMatch2.price} {t.aed}</span>
@@ -471,73 +643,177 @@ export default function ProductDetailsView() {
 
           </div>
 
-          {/* Pricing calculations and buy button */}
-          <div className="lg:col-span-4 bg-brand-secondary/30 p-6 rounded-2xl border border-brand-sage-muted/30 flex flex-col items-center justify-center space-y-4">
-            <div className="text-center">
-              <span className="text-[10px] text-zinc-300 block font-sans uppercase">{language === 'en' ? 'Combined bundle' : 'إجمالي سعر الفردية'}</span>
+          <div className="lg:col-span-4 bg-brand-secondary/30 p-6 rounded-xl border border-brand-sage-muted/30 flex flex-col items-center justify-center space-y-4">
+            <div className="text-center font-sans">
+              <span className="input-label !mb-1.5 text-zinc-300">{language === 'en' ? 'Combined bundle' : 'إجمالي سعر الفردية'}</span>
               <div className="flex items-center justify-center space-x-2 rtl:space-x-reverse">
-                <span className="text-zinc-400 line-through text-xs font-sans">{bundleSubtotal} {t.aed}</span>
-                <span className="text-brand-sage-light text-xl font-bold font-sans">{bundleTotal} {t.aed}</span>
+                <span className="text-zinc-400 line-through text-xs">{bundleSubtotal} {t.aed}</span>
+                <span className="text-brand-sage-light text-xl font-bold">{bundleTotal} {t.aed}</span>
               </div>
-              <span className="text-[9px] bg-emerald-600 font-sans text-white px-2 py-0.5 rounded font-bold uppercase mt-1 inline-block">
+              <span className="badge badge-success !text-[9px] mt-2">
                 {language === 'en' ? 'Includes 10% Bundle Discount' : 'يشمل خصم تشجيعي 10٪'}
               </span>
             </div>
 
             <button
               onClick={handleAddBundleToCart}
-              className="bg-brand-sage-light text-brand-primary hover:bg-white w-full rounded-xl py-3.5 text-xs uppercase tracking-wider font-bold text-center transition-colors cursor-pointer"
+              className="w-full bg-brand-sage-light text-brand-primary hover:bg-white rounded-xl py-3 text-xs uppercase tracking-wider font-bold text-center transition-colors cursor-pointer"
             >
               {language === 'en' ? t.addBundleBtnEn : t.addBundleBtnAr}
             </button>
           </div>
         </div>
-
       </div>
+      */}
+
+      {/* Curated Routine Bundle Integration */}
+      {matchingBundle && (
+        <div className="bg-white border border-brand-sage-light/20 rounded-3xl p-6 sm:p-8 shadow-sm animate-fade-in">
+          {/* Section Header */}
+          <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-150/60 pb-4">
+            <div>
+              <span className="text-[10px] tracking-widest font-semibold uppercase text-brand-primary/70 block mb-1">
+                {language === 'en' ? 'Clinical Synergy Routine' : 'تآزر الروتين الطبي الموصى به'}
+              </span>
+              <h3 className="font-serif text-2xl font-bold text-brand-primary">
+                {language === 'en' ? 'Complete Your Daily Ritual' : 'أكملي طقوس العناية اليومية الخاصة بكِ'}
+              </h3>
+            </div>
+            <button
+              onClick={() => setSelectedBundle(matchingBundle)}
+              className="text-xs text-brand-primary font-bold uppercase tracking-wider hover:text-brand-secondary flex items-center gap-1 cursor-pointer font-sans w-fit transition-colors"
+            >
+              <span>{language === 'en' ? 'Learn More About This Routine' : 'تفاصيل هذا الروتين بالكامل'}</span>
+              <ArrowRight size={13} className="rtl:rotate-180" />
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+            {/* Left: Bundle Summary Card (Creative Dark Glass) */}
+            <div className="lg:col-span-4 bg-brand-primary text-brand-cream p-6 rounded-2xl flex flex-col justify-between space-y-6 shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 right-0 -mt-8 -mr-8 w-24 h-24 rounded-full bg-brand-secondary/30 blur-2xl pointer-events-none" />
+              
+              <div className="space-y-3">
+                <span className="inline-block bg-red-650 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider text-white">
+                  -{matchingBundle.discountPercentage}% OFF
+                </span>
+                <h4 className="font-serif text-xl font-bold">
+                  {language === 'en' ? matchingBundle.nameEn : matchingBundle.nameAr}
+                </h4>
+                <p className="text-[11px] text-zinc-300 leading-relaxed font-sans">
+                  {language === 'en'
+                    ? 'Purchase this curated routine together to activate clinical ingredient synergy and save on the set.'
+                    : 'احصلي على هذا الروتين المنسق معاً لتنشيط التآزر الطبي للمكونات وتوفير سعر المجموعة.'}
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                <div className="border-t border-brand-secondary/30 pt-4 flex justify-between items-baseline font-sans">
+                  <span className="text-[10px] text-zinc-300 uppercase">{language === 'en' ? 'Total Price' : 'السعر الإجمالي'}</span>
+                  <div className="text-right flex flex-col items-end">
+                    <span className="text-[10px] text-zinc-400 line-through">
+                      {matchingBundle.originalPrice} {language === 'en' ? 'AED/SAR' : 'ريال'}
+                    </span>
+                    <span className="text-xl font-bold text-white">
+                      {matchingBundle.bundlePrice} {language === 'en' ? 'AED/SAR' : 'ريال'}
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => {
+                    matchingBundle.items.forEach((item) => {
+                      addToCart(item.product, item.product.size, 1);
+                    });
+                    setActivePage('cart');
+                  }}
+                  className="w-full bg-brand-cream hover:bg-white text-brand-primary active:scale-[0.98] transition-all rounded-xl py-3 text-xs uppercase tracking-wider font-bold text-center cursor-pointer shadow-sm font-sans"
+                >
+                  {language === 'en' ? 'Add Entire Routine' : 'أضيفي الروتين بالكامل للحقيبة'}
+                </button>
+              </div>
+            </div>
+
+            {/* Right: Step Cards Grid (Clickable) */}
+            <div className="lg:col-span-8 flex flex-col md:flex-row items-center justify-between gap-6 relative">
+              
+              {/* Step cards list */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full h-full">
+                {matchingBundle.items.map((item, index) => {
+                  const p = item.product;
+                  const isCurrent = p.id === selectedProduct.id;
+                  return (
+                    <div 
+                      key={p.id}
+                      onClick={() => {
+                        setSelectedProduct(p);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className={`group relative bg-zinc-50 hover:bg-zinc-100/70 border rounded-2xl p-5 transition-all duration-300 cursor-pointer flex flex-col justify-between h-full hover:shadow-sm ${
+                        isCurrent 
+                          ? 'border-brand-primary/40 ring-1 ring-brand-primary/10 bg-brand-cream/10' 
+                          : 'border-zinc-200/60'
+                      }`}
+                    >
+                      {/* Step & Action Indicator */}
+                      <div className="flex justify-between items-center mb-3">
+                        <span className="bg-white border border-zinc-200 text-zinc-500 font-sans text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">
+                          {language === 'en' ? `Step 0${index + 1}` : `الخطوة 0${index + 1}`}
+                        </span>
+                        {isCurrent && (
+                          <span className="bg-brand-primary text-brand-cream text-[8px] font-bold px-2 py-0.5 rounded-full font-sans uppercase">
+                            {language === 'en' ? 'Active View' : 'المعروض حالياً'}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex items-start gap-4 mb-4">
+                        <div className="w-14 h-16 rounded-lg overflow-hidden bg-white border border-zinc-100 p-0.5 flex-shrink-0 shadow-3xs group-hover:scale-105 transition-transform duration-300">
+                          <img src={p.image} alt={p.nameEn} className="w-full h-full object-cover rounded" />
+                        </div>
+                        <div className="min-w-0">
+                          <span className="text-[9px] text-brand-sage-muted font-bold block uppercase tracking-wider mb-1 font-sans">
+                            {language === 'en' ? item.stepEn.split(':')[1] || item.stepEn : item.stepAr.split(':')[1] || item.stepAr}
+                          </span>
+                          <h5 className="font-serif text-xs font-bold text-zinc-900 leading-snug group-hover:text-brand-primary transition-colors line-clamp-2">
+                            {language === 'en' ? p.nameEn : p.nameAr}
+                          </h5>
+                        </div>
+                      </div>
+
+                      {/* View Details Action Link */}
+                      <div className="border-t border-zinc-200/50 pt-3 flex items-center justify-between text-[10px] text-zinc-500 group-hover:text-brand-primary transition-colors font-sans">
+                        <span>{p.size}</span>
+                        <span className="font-bold uppercase tracking-wider flex items-center gap-1">
+                          {language === 'en' ? 'View Details' : 'عرض التفاصيل'}
+                          <ArrowRight size={10} className="rtl:rotate-180 group-hover:translate-x-0.5 transition-transform" />
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* RELATED RECOMMENDATIONS ROW */}
       {relatedProducts.length > 0 && (
         <div className="space-y-6 pt-6">
-          <div className="border-b border-brand-sage-light/25 pb-4">
-            <h2 className="font-serif text-2xl font-bold text-brand-primary tracking-tight">
-              {language === 'en' ? t.relatedTitleEn : t.relatedTitleAr}
-            </h2>
-            <p className="text-xs text-zinc-600 font-sans">
-              {language === 'en' ? t.relatedSubtitleEn : t.relatedSubtitleAr}
-            </p>
-          </div>
+          <SectionTitle
+            subtitle={language === 'en' ? 'Clinical Pairings' : 'توصيات سريرية متوافقة'}
+            title={language === 'en' ? t.relatedTitleEn : t.relatedTitleAr}
+            description={language === 'en' ? t.relatedSubtitleEn : t.relatedSubtitleAr}
+          />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {relatedProducts.map((p) => {
-              const isWished = wishlist.includes(p.id);
-              const hasDiscount = p.discountPrice !== undefined;
-              return (
-                <div
-                  key={p.id}
-                  onClick={() => setSelectedProduct(p)}
-                  className="bg-white rounded-2xl border border-zinc-100 p-4 shadow-3xs cursor-pointer hover:border-brand-sage-muted hover:shadow-md transition-all duration-300 group flex space-x-4 rtl:space-x-reverse relative"
-                >
-                  <img src={p.image} alt={p.nameEn} className="w-16 h-20 rounded-lg object-cover" />
-                  <div className="flex-1 min-w-0 flex flex-col justify-between">
-                    <div>
-                      <h4 className="font-serif text-xs font-bold text-zinc-900 group-hover:text-brand-primary transition-colors truncate">
-                        {language === 'en' ? p.nameEn : p.nameAr}
-                      </h4>
-                      <p className="text-[10px] text-zinc-400 font-sans mt-0.5">{p.size} • {language === 'en' ? p.skinTypeEn : p.skinTypeAr}</p>
-                    </div>
-
-                    <div className="flex items-center justify-between mt-2 pt-2 border-t border-zinc-50 font-sans">
-                      <span className="text-brand-primary font-bold text-xs">
-                        {p.discountPrice ?? p.price} {t.aed}
-                      </span>
-                      <span className="text-brand-primary group-hover:translate-x-1 duration-250 transition-transform">
-                        <ArrowRight size={13} />
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {relatedProducts.map((p) => (
+              <div key={p.id} className="w-full">
+                <ProductCard product={p} />
+              </div>
+            ))}
           </div>
         </div>
       )}

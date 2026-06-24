@@ -1,5 +1,8 @@
+"use client";
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Language, Product, CartItem, Coupon, Order, Address, UserProfile, Category } from '../types';
+import { useRouter, usePathname } from 'next/navigation';
+import { Language, Product, CartItem, Coupon, Order, Address, UserProfile, Category, Bundle } from '../types';
 import { PRODUCTS, CATEGORIES, COUPONS } from '../constants/data';
 
 interface AppContextType {
@@ -40,6 +43,8 @@ interface AppContextType {
   setPriceRange: (range: [number, number]) => void;
   sortBy: string;
   setSortBy: (sort: string) => void;
+  selectedBundle: Bundle | null;
+  setSelectedBundle: (bundle: Bundle | null) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -67,14 +72,118 @@ const DEFAULT_USER: UserProfile = {
 };
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const router = useRouter();
+  const pathname = usePathname();
   const [language, setLanguageState] = useState<Language>('en');
   const [activePage, setActivePageState] = useState<string>('home');
   const [selectedProduct, setSelectedProductState] = useState<Product | null>(null);
+  const [selectedBundle, setSelectedBundleState] = useState<Bundle | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [wishlist, setWishlist] = useState<string[]>(['prod_ocean_glow']);
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
   const [user, setUser] = useState<UserProfile | null>(DEFAULT_USER);
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<Order[]>([
+    {
+      id: 'ord_mock_1',
+      orderNumber: 'NFD1234',
+      date: '12/2/2024',
+      status: 'delivered',
+      items: [
+        {
+          productId: 'prod_ocean_glow',
+          productNameEn: 'Coastal Ocean Glow Hyaluronic Elixir',
+          productNameAr: 'سيروم الهيالورونيك الساحلي لإشراقة المحيط',
+          price: 1240,
+          quantity: 3,
+          image: 'https://images.unsplash.com/photo-1608248597481-496100c80836?auto=format&fit=crop&w=150&q=80',
+          selectedSize: '50ml'
+        }
+      ],
+      shippingAddress: DEFAULT_USER.addresses[0],
+      paymentMethod: 'credit_card',
+      subtotal: 3720,
+      discount: 0,
+      shippingFee: 0,
+      total: 3720,
+      trackingNumber: 'TRK-98312019',
+      estimatedDelivery: '2024-02-15'
+    },
+    {
+      id: 'ord_mock_2',
+      orderNumber: 'NFD1234',
+      date: '12/2/2024',
+      status: 'processing',
+      items: [
+        {
+          productId: 'prod_ocean_glow',
+          productNameEn: 'Coastal Ocean Glow Hyaluronic Elixir',
+          productNameAr: 'سيروم الهيالورونيك الساحلي لإشراقة المحيط',
+          price: 1240,
+          quantity: 3,
+          image: 'https://images.unsplash.com/photo-1608248597481-496100c80836?auto=format&fit=crop&w=150&q=80',
+          selectedSize: '50ml'
+        }
+      ],
+      shippingAddress: DEFAULT_USER.addresses[0],
+      paymentMethod: 'credit_card',
+      subtotal: 3720,
+      discount: 0,
+      shippingFee: 0,
+      total: 3720,
+      trackingNumber: 'TRK-98312020',
+      estimatedDelivery: '2024-02-16'
+    },
+    {
+      id: 'ord_mock_3',
+      orderNumber: 'NFD1234',
+      date: '12/2/2024',
+      status: 'in-transit',
+      items: [
+        {
+          productId: 'prod_ocean_glow',
+          productNameEn: 'Coastal Ocean Glow Hyaluronic Elixir',
+          productNameAr: 'سيروم الهيالورونيك الساحلي لإشراقة المحيط',
+          price: 1240,
+          quantity: 3,
+          image: 'https://images.unsplash.com/photo-1608248597481-496100c80836?auto=format&fit=crop&w=150&q=80',
+          selectedSize: '50ml'
+        }
+      ],
+      shippingAddress: DEFAULT_USER.addresses[0],
+      paymentMethod: 'credit_card',
+      subtotal: 3720,
+      discount: 0,
+      shippingFee: 0,
+      total: 3720,
+      trackingNumber: 'TRK-98312021',
+      estimatedDelivery: '2024-02-15'
+    },
+    {
+      id: 'ord_mock_4',
+      orderNumber: 'NFD1234',
+      date: '12/2/2024',
+      status: 'returned',
+      items: [
+        {
+          productId: 'prod_botanical_gel',
+          productNameEn: 'Prebiotic Botanical Gel Cleanser',
+          productNameAr: 'غسول الجل النباتي الحيوي المقوي للبشرة',
+          price: 1240,
+          quantity: 1,
+          image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=150&q=80',
+          selectedSize: '150ml'
+        }
+      ],
+      shippingAddress: DEFAULT_USER.addresses[0],
+      paymentMethod: 'credit_card',
+      subtotal: 1240,
+      discount: 0,
+      shippingFee: 0,
+      total: 1240,
+      trackingNumber: 'TRK-98312022',
+      estimatedDelivery: '2024-02-14'
+    }
+  ]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [searchHistory, setSearchHistory] = useState<string[]>(['Serum', 'Moisturizer', 'Cleanser']);
   
@@ -83,6 +192,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [activeSkinType, setActiveSkinType] = useState<string | null>(null);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 500]);
   const [sortBy, setSortBy] = useState<string>('best-selling');
+
+  // Sync state active page with current router pathname
+  useEffect(() => {
+    if (!pathname) return;
+    let page = 'home';
+    if (pathname === '/shop') page = 'shop';
+    else if (pathname === '/cart') page = 'cart';
+    else if (pathname === '/checkout') page = 'checkout';
+    else if (pathname === '/profile') page = 'profile';
+    else if (pathname === '/auth') page = 'auth';
+    else if (pathname === '/product-details') page = 'product-details';
+    else if (pathname === '/bundles') page = 'bundles';
+    
+    if (page !== activePage) {
+      setActivePageState(page);
+    }
+  }, [pathname]);
+
 
   // Trigger Language and Direction Sync
   const setLanguage = (lang: Language) => {
@@ -103,16 +230,48 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const setActivePage = (page: string) => {
     setActivePageState(page);
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+    
+    let path = '/';
+    if (page === 'home') path = '/';
+    else if (page === 'shop') path = '/shop';
+    else if (page === 'cart') path = '/cart';
+    else if (page === 'checkout') path = '/checkout';
+    else if (page === 'profile') path = '/profile';
+    else if (page === 'auth') path = '/auth';
+    else if (page === 'developer-specs') path = '/developer-specs';
+    else if (page === 'bundles') path = '/bundles';
+    
+    router.push(path);
   };
+
 
   const setSelectedProduct = (product: Product | null) => {
     setSelectedProductState(product);
     if (product) {
+      setSelectedBundleState(null);
       setActivePageState('product-details');
-      window.scrollTo({ top: 0, behavior: 'instant' });
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      }
+      router.push('/product-details');
     }
   };
+
+  const setSelectedBundle = (bundle: Bundle | null) => {
+    setSelectedBundleState(bundle);
+    if (bundle) {
+      setSelectedProductState(null);
+      setActivePageState('product-details');
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      }
+      router.push('/product-details');
+    }
+  };
+
 
   const addToCart = (product: Product, size: string, qty = 1) => {
     const itemId = `${product.id}_${size}`;
@@ -319,6 +478,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setActivePage,
         selectedProduct,
         setSelectedProduct,
+        selectedBundle,
+        setSelectedBundle,
         cart,
         addToCart,
         removeFromCart,

@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from 'react';
 import { useApp } from '../../store/AppContext';
 import { Check, ShieldCheck, CreditCard, ShoppingBag, Truck, Lock, ArrowLeft, ArrowRight } from 'lucide-react';
@@ -181,22 +183,22 @@ export default function CheckoutView() {
   // If order was successfully built
   if (placedOrderDetails) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-16 text-center space-y-8">
-        <div className="w-20 h-20 rounded-full bg-emerald-50 border-2 border-emerald-100 flex items-center justify-center text-emerald-600 mx-auto">
+      <div className="max-w-3xl mx-auto px-4 py-16 text-center space-y-8 animate-fade-in">
+        <div className="w-20 h-20 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 mx-auto animate-bounce">
           <Check size={38} />
         </div>
 
         <div className="space-y-3">
-          <h1 className="font-serif text-3xl font-bold text-zinc-900">
+          <h1 className="font-serif text-3xl font-bold text-brand-primary">
             {language === 'en' ? t.thankYouEn : t.thankYouAr}
           </h1>
-          <p className="text-zinc-650 text-xs sm:text-sm max-w-lg mx-auto leading-relaxed font-sans">
+          <p className="text-zinc-500 text-xs sm:text-sm max-w-lg mx-auto leading-relaxed font-sans">
             {language === 'en' ? t.successDescEn : t.successDescAr}
           </p>
         </div>
 
         {/* Invoice Summary Receipt Card */}
-        <div className="bg-white border border-brand-secondary/15 rounded-2xl p-6 shadow-sm text-left rtl:text-right space-y-4 font-sans text-xs">
+        <div className="card-elevated bg-white p-6 text-left rtl:text-right space-y-4 font-sans text-xs !rounded-2xl">
           <div className="grid grid-cols-2 gap-4 pb-4 border-b border-brand-cream text-zinc-600">
             <div>
               <span className="block text-[10px] text-zinc-400 uppercase font-semibold">{language === 'en' ? t.orderNumEn : t.orderNumAr}</span>
@@ -215,25 +217,16 @@ export default function CheckoutView() {
             </div>
             <div className="flex justify-between">
               <span>{language === 'en' ? t.deliveryEstEn : t.deliveryEstAr}</span>
-              <span className="font-semibold text-zinc-805 text-emerald-700">{placedOrderDetails.estimatedDelivery}</span>
+              <span className="font-semibold text-zinc-800">3-5 {language === 'en' ? 'Business Days' : 'أيام عمل'}</span>
             </div>
-            <div className="flex justify-between">
-              <span>{language === 'en' ? 'Recipient Name' : 'اسم المستلم والمصرح'}</span>
-              <span className="font-bold text-zinc-800">{placedOrderDetails.shippingAddress.fullName}</span>
-            </div>
-          </div>
-
-          <div className="flex justify-between pt-2">
-            <span className="font-serif text-sm font-bold text-zinc-800">{language === 'en' ? 'Calculated Grand Total' : 'القيمة المدفوعة الإجمالية'}</span>
-            <span className="text-brand-primary font-bold text-base font-sans">{placedOrderDetails.total} {t.aed}</span>
           </div>
         </div>
-
+          
         <button
           onClick={() => {
             setActivePage('profile'); // Goes straight to profile orders page where tracking can be inspected live
           }}
-          className="bg-brand-primary hover:bg-brand-secondary text-brand-cream py-3.5 px-8 rounded-xl text-xs uppercase tracking-wider font-semibold shadow-sm cursor-pointer inline-flex items-center space-x-2 rtl:space-x-reverse"
+          className="btn-primary !py-3.5 !px-8"
         >
           <span>{language === 'en' ? t.trackPageBtnEn : t.trackPageBtnAr}</span>
         </button>
@@ -244,93 +237,103 @@ export default function CheckoutView() {
   // Guard if cart is mysteriously empty
   if (cart.length === 0) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-20 text-center">
-        <p className="text-zinc-650 font-serif mb-4">You have no items inside your Shopping bag to check out.</p>
-        <button onClick={() => setActivePage('shop')} className="bg-brand-primary text-brand-cream text-xs font-semibold py-3 px-6 rounded-xl uppercase tracking-wider cursor-pointer">Begin Selection</button>
+      <div className="max-w-md mx-auto px-4 py-24 text-center space-y-6 flex flex-col items-center justify-center animate-fade-up">
+        <div className="w-16 h-16 rounded-full bg-brand-cream border border-brand-sage-light/15 flex items-center justify-center text-brand-primary">
+          <ShoppingBag size={28} />
+        </div>
+        <p className="text-zinc-550 font-serif max-w-xs">{language === 'en' ? 'You have no items inside your Shopping bag to check out.' : 'لا توجد مستحضرات في حقيبتكِ لإتمام الشراء.'}</p>
+        <button onClick={() => setActivePage('shop')} className="btn-primary">Begin Selection</button>
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8 animate-fade-in">
       
       {/* Page Title */}
-      <h1 className="font-serif text-2xl sm:text-3xl font-bold text-brand-primary border-b border-brand-sage-light/10 pb-4">
-        {language === 'en' ? t.checkoutTitleEn : t.checkoutTitleAr}
-      </h1>
+      <div className="border-b border-brand-sage-light/12 pb-4">
+        <h1 className="font-serif text-2xl sm:text-3xl font-bold text-brand-primary">
+          {language === 'en' ? t.checkoutTitleEn : t.checkoutTitleAr}
+        </h1>
+      </div>
 
       {/* Steps Indicator Bar */}
-      <div className="flex justify-between items-center max-w-4xl mx-auto bg-white p-4.5 rounded-2xl border border-brand-sage-light/10 text-xs text-zinc-400 font-semibold font-sans">
+      <div className="flex justify-between items-center max-w-4xl mx-auto bg-white p-4 sm:p-5 rounded-2xl border border-brand-sage-light/10 text-xs text-zinc-400 font-semibold font-sans shadow-3xs">
         {[
           { text: language === 'en' ? t.step1En : t.step1Ar, s: 1 },
           { text: language === 'en' ? t.step2En : t.step2Ar, s: 2 },
           { text: language === 'en' ? t.step3En : t.step3Ar, s: 3 },
           { text: language === 'en' ? t.step4En : t.step4Ar, s: 4 }
-        ].map((item) => (
-          <div key={item.s} className="flex items-center space-x-1.5 rtl:space-x-reverse">
-            <span className={`w-6 h-6 rounded-full flex items-center justify-center border font-bold text-[10px] ${
-              step >= item.s ? 'bg-brand-primary text-brand-cream border-brand-primary' : 'bg-zinc-50 border-zinc-200'
-            }`}>
-              {item.s}
-            </span>
-            <span className={`hidden sm:inline ${step === item.s ? 'text-zinc-900 font-bold' : ''}`}>
-              {item.text}
-            </span>
-          </div>
+        ].map((item, idx) => (
+          <React.Fragment key={item.s}>
+            {idx > 0 && (
+              <div className={`step-connector ${step >= item.s ? 'step-connector-active' : ''}`} />
+            )}
+            <div className="flex items-center space-x-2 rtl:space-x-reverse">
+              <span className={`w-7 h-7 rounded-full flex items-center justify-center border font-bold text-[10px] transition-all duration-300 ${
+                step >= item.s ? 'bg-brand-primary text-brand-cream border-brand-primary shadow-sm' : 'bg-brand-cream/30 border-brand-sage-light/20 text-brand-sage-muted'
+              }`}>
+                {item.s}
+              </span>
+              <span className={`hidden md:inline ${step === item.s ? 'text-brand-primary font-bold' : 'text-brand-sage-muted'}`}>
+                {item.text}
+              </span>
+            </div>
+          </React.Fragment>
         ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
         {/* LEFT WORKSPACE: STEP DETAILS */}
-        <div className="lg:col-span-8 bg-white rounded-3xl p-6 sm:p-8 border border-brand-sage-light/10 shadow-xs space-y-6">
+        <div className="lg:col-span-8 card-base bg-white p-6 sm:p-8 !rounded-2xl space-y-6">
           
           {formError && (
-            <p className="p-3 bg-red-50 text-red-700 text-xs font-semibold font-sans rounded-xl border border-red-100 flex items-center">
+            <p className="p-3 bg-red-50 text-red-700 text-xs font-semibold font-sans rounded-xl border border-red-100 flex items-center animate-fade-up">
               <span>{formError}</span>
             </p>
           )}
 
           {/* STEP 1: GUEST / CUSTOMER DATA */}
           {step === 1 && (
-            <div className="space-y-4 font-sans text-xs">
-              <h3 className="font-serif text-base font-bold text-zinc-900 border-b border-zinc-100 pb-2 flex items-center">
-                <Lock className="mr-1.5 rtl:ml-1.5 text-brand-sage-muted" size={16} />
+            <div className="space-y-4 font-sans text-xs animate-fade-in">
+              <h3 className="font-serif text-base font-bold text-brand-primary border-b border-brand-cream pb-2 flex items-center">
+                <Lock className="mr-2 rtl:ml-2 text-brand-sage-muted" size={16} />
                 {language === 'en' ? t.guestEn : t.guestAr}
               </h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-zinc-400 uppercase tracking-widest block font-bold text-[9px]">{language === 'en' ? t.fullNameEn : t.fullNameAr}</label>
+                  <label className="input-label">{language === 'en' ? t.fullNameEn : t.fullNameAr}</label>
                   <input
                     type="text"
                     required
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
-                    className="w-full bg-zinc-50 border border-zinc-250 focus:border-brand-primary focus:outline-none rounded-xl py-3 px-4 shadow-inner text-zinc-800"
+                    className="input-field"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-zinc-400 uppercase tracking-widest block font-bold text-[9px]">{language === 'en' ? t.emailEn : t.emailAr}</label>
+                  <label className="input-label">{language === 'en' ? t.emailEn : t.emailAr}</label>
                   <input
                     type="email"
                     required
                     value={customerEmail}
                     onChange={(e) => setCustomerEmail(e.target.value)}
-                    className="w-full bg-zinc-50 border border-zinc-250 focus:border-brand-primary focus:outline-none rounded-xl py-3 px-4 shadow-inner text-zinc-800"
+                    className="input-field"
                   />
                 </div>
               </div>
 
               <div className="space-y-1.5 max-w-sm">
-                <label className="text-zinc-400 uppercase tracking-widest block font-bold text-[9px]">{language === 'en' ? t.phoneEn : t.phoneAr}</label>
+                <label className="input-label">{language === 'en' ? t.phoneEn : t.phoneAr}</label>
                 <input
                   type="tel"
                   required
                   value={customerPhone}
                   placeholder="+966 5x xxx xxxx"
                   onChange={(e) => setCustomerPhone(e.target.value)}
-                  className="w-full bg-zinc-50 border border-zinc-250 focus:border-brand-primary focus:outline-none rounded-xl py-3 px-4 shadow-inner text-zinc-800"
+                  className="input-field"
                 />
               </div>
             </div>
@@ -338,62 +341,62 @@ export default function CheckoutView() {
 
           {/* STEP 2: DISPATCH ADDRESS */}
           {step === 2 && (
-            <div className="space-y-4 font-sans text-xs">
-              <h3 className="font-serif text-base font-bold text-zinc-900 border-b border-zinc-100 pb-2 flex items-center">
-                <Truck className="mr-1.5 rtl:ml-1.5 text-brand-sage-muted" size={16} />
+            <div className="space-y-4 font-sans text-xs animate-fade-in">
+              <h3 className="font-serif text-base font-bold text-brand-primary border-b border-brand-cream pb-2 flex items-center">
+                <Truck className="mr-2 rtl:ml-2 text-brand-sage-muted" size={16} />
                 {language === 'en' ? t.step2En : t.step2Ar}
               </h3>
 
               <div className="space-y-1.5">
-                <label className="text-zinc-400 uppercase tracking-widest block font-bold text-[9px]">{language === 'en' ? t.streetEn : t.streetAr}</label>
+                <label className="input-label">{language === 'en' ? t.streetEn : t.streetAr}</label>
                 <input
                   type="text"
                   required
                   value={shippingLine1}
                   onChange={(e) => setShippingLine1(e.target.value)}
-                  className="w-full bg-zinc-50 border border-zinc-250 focus:border-brand-primary focus:outline-none rounded-xl py-3 px-4 shadow-inner text-zinc-800"
+                  className="input-field"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-zinc-400 uppercase tracking-widest block font-bold text-[9px]">{language === 'en' ? t.cityEn : t.cityAr}</label>
+                  <label className="input-label">{language === 'en' ? t.cityEn : t.cityAr}</label>
                   <input
                     type="text"
                     required
                     value={shippingCity}
                     onChange={(e) => setShippingCity(e.target.value)}
-                    className="w-full bg-zinc-50 border border-zinc-250 focus:border-brand-primary focus:outline-none rounded-xl py-3 px-4 shadow-inner text-zinc-800"
+                    className="input-field"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-zinc-400 uppercase tracking-widest block font-bold text-[9px]">{language === 'en' ? t.provinceEn : t.provinceAr}</label>
+                  <label className="input-label">{language === 'en' ? t.provinceEn : t.provinceAr}</label>
                   <input
                     type="text"
                     value={shippingState}
                     onChange={(e) => setShippingState(e.target.value)}
-                    className="w-full bg-zinc-50 border border-zinc-250 focus:border-brand-primary focus:outline-none rounded-xl py-3 px-4 shadow-inner text-zinc-800"
+                    className="input-field"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-zinc-400 uppercase tracking-widest block font-bold text-[9px]">{language === 'en' ? t.postalEn : t.postalAr}</label>
+                  <label className="input-label">{language === 'en' ? t.postalEn : t.postalAr}</label>
                   <input
                     type="text"
                     required
                     value={postalCode}
                     onChange={(e) => setPostalCode(e.target.value)}
-                    className="w-full bg-zinc-50 border border-zinc-250 focus:border-brand-primary focus:outline-none rounded-xl py-3 px-4 shadow-inner text-zinc-800"
+                    className="input-field"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-zinc-400 uppercase tracking-widest block font-bold text-[9px]">{language === 'en' ? t.countryEn : t.countryAr}</label>
+                  <label className="input-label">{language === 'en' ? t.countryEn : t.countryAr}</label>
                   <select
                     value={shippingCountry}
                     onChange={(e) => setShippingCountry(e.target.value)}
-                    className="w-full bg-zinc-50 border border-zinc-250 focus:border-brand-primary focus:outline-none rounded-xl py-3 px-4 shadow-inner text-zinc-800 font-sans cursor-pointer"
+                    className="input-field cursor-pointer !bg-white"
                   >
                     <option value="Saudi Arabia">Saudi Arabia / السعودية</option>
                     <option value="United Arab Emirates">United Arab Emirates / الإمارات</option>
@@ -405,58 +408,58 @@ export default function CheckoutView() {
 
           {/* STEP 3: PAYMENT TYPE */}
           {step === 3 && (
-            <div className="space-y-6 font-sans text-xs">
-              <h3 className="font-serif text-base font-bold text-zinc-900 border-b border-zinc-100 pb-2 flex items-center">
-                <CreditCard className="mr-1.5 rtl:ml-1.5 text-brand-sage-muted" size={16} />
+            <div className="space-y-6 font-sans text-xs animate-fade-in">
+              <h3 className="font-serif text-base font-bold text-brand-primary border-b border-brand-cream pb-2 flex items-center">
+                <CreditCard className="mr-2 rtl:ml-2 text-brand-sage-muted" size={16} />
                 {language === 'en' ? t.step3En : t.step3Ar}
               </h3>
 
               <div className="space-y-3">
                 {/* CC input choose option */}
                 <label className={`flex items-start p-4 border rounded-2xl cursor-pointer transition-all ${
-                  paymentMethod === 'credit_card' ? 'border-brand-primary bg-zinc-50' : 'border-zinc-200 hover:bg-zinc-50'
+                  paymentMethod === 'credit_card' ? 'border-brand-primary bg-brand-cream/15' : 'border-brand-sage-light/15 hover:bg-brand-cream/10'
                 }`}>
                   <input
                     type="radio"
                     name="payOption"
                     checked={paymentMethod === 'credit_card'}
                     onChange={() => setPaymentMethod('credit_card')}
-                    className="w-4 h-4 accent-brand-secondary mr-3 rtl:ml-3 flex-shrink-0 mt-0.5"
+                    className="w-4 h-4 accent-brand-primary mr-3 rtl:ml-3 flex-shrink-0 mt-0.5"
                   />
                   <div className="flex-1">
-                    <span className="font-bold text-zinc-900 block">{language === 'en' ? t.payCCEn : t.payCCAr}</span>
+                    <span className="font-bold text-brand-primary block">{language === 'en' ? t.payCCEn : t.payCCAr}</span>
                     
                     {paymentMethod === 'credit_card' && (
-                      <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3 outline-none border-t border-zinc-200/50 pt-4 animate-in fade-in duration-350">
+                      <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3 outline-none border-t border-brand-sage-light/10 pt-4 animate-fade-in">
                         <div className="sm:col-span-3 space-y-1">
-                          <label className="text-[10px] text-zinc-450 uppercase font-semibold">{t.cardNumEn}</label>
+                          <label className="text-[10px] text-brand-sage-muted uppercase font-semibold">{t.cardNumEn}</label>
                           <input
                             type="text"
                             placeholder="4242 •••• •••• ••••"
                             value={ccNumber}
                             onChange={(e) => setCcNumber(e.target.value)}
-                            className="bg-white border border-zinc-250 focus:border-brand-primary rounded-xl py-2 px-3 text-xs w-full text-zinc-800 font-mono"
+                            className="bg-white border border-brand-sage-light/20 focus:border-brand-primary rounded-xl py-2 px-3 text-xs w-full text-zinc-800 font-mono focus:outline-none"
                           />
                         </div>
                         <div className="space-y-1">
-                          <label className="text-[10px] text-zinc-450 uppercase font-semibold">{t.validEn}</label>
+                          <label className="text-[10px] text-brand-sage-muted uppercase font-semibold">{t.validEn}</label>
                           <input
                             type="text"
                             placeholder="MM/YY"
                             value={ccExpiry}
                             onChange={(e) => setCcExpiry(e.target.value)}
-                            className="bg-white border border-zinc-250 focus:border-brand-primary rounded-xl py-2 px-3 text-xs w-full text-zinc-800 font-mono"
+                            className="bg-white border border-brand-sage-light/20 focus:border-brand-primary rounded-xl py-2 px-3 text-xs w-full text-zinc-800 font-mono focus:outline-none"
                           />
                         </div>
                         <div className="space-y-1">
-                          <label className="text-[10px] text-zinc-450 uppercase font-semibold">CVV</label>
+                          <label className="text-[10px] text-brand-sage-muted uppercase font-semibold">CVV</label>
                           <input
                             type="password"
                             placeholder="•••"
                             maxLength={3}
                             value={ccCvv}
                             onChange={(e) => setCcCvv(e.target.value)}
-                            className="bg-white border border-zinc-250 focus:border-brand-primary rounded-xl py-2 px-3 text-xs w-full text-zinc-800 font-mono"
+                            className="bg-white border border-brand-sage-light/20 focus:border-brand-primary rounded-xl py-2 px-3 text-xs w-full text-zinc-800 font-mono focus:outline-none"
                           />
                         </div>
                       </div>
@@ -466,17 +469,17 @@ export default function CheckoutView() {
 
                 {/* COD option choose */}
                 <label className={`flex items-start p-4 border rounded-2xl cursor-pointer transition-all ${
-                  paymentMethod === 'cod' ? 'border-brand-primary bg-zinc-50' : 'border-zinc-200 hover:bg-zinc-50'
+                  paymentMethod === 'cod' ? 'border-brand-primary bg-brand-cream/15' : 'border-brand-sage-light/15 hover:bg-brand-cream/10'
                 }`}>
                   <input
                     type="radio"
                     name="payOption"
                     checked={paymentMethod === 'cod'}
                     onChange={() => setPaymentMethod('cod')}
-                    className="w-4 h-4 accent-brand-secondary mr-3 rtl:ml-3 flex-shrink-0 mt-0.5"
+                    className="w-4 h-4 accent-brand-primary mr-3 rtl:ml-3 flex-shrink-0 mt-0.5"
                   />
                   <div>
-                    <span className="font-bold text-zinc-900 block">{language === 'en' ? t.payCODEn : t.payCODAr}</span>
+                    <span className="font-bold text-brand-primary block">{language === 'en' ? t.payCODEn : t.payCODAr}</span>
                   </div>
                 </label>
               </div>
@@ -485,9 +488,9 @@ export default function CheckoutView() {
 
           {/* STEP 4: MEMORANDUM REVIEW */}
           {step === 4 && (
-            <div className="space-y-4 font-sans text-xs">
-              <h3 className="font-serif text-base font-bold text-zinc-900 border-b border-zinc-100 pb-2 flex items-center">
-                <Check className="mr-1.5 rtl:ml-1.5 text-brand-sage-muted" size={16} />
+            <div className="space-y-4 font-sans text-xs animate-fade-in">
+              <h3 className="font-serif text-base font-bold text-brand-primary border-b border-brand-cream pb-2 flex items-center">
+                <Check className="mr-2 rtl:ml-2 text-brand-sage-muted" size={16} />
                 {language === 'en' ? t.reviewTitleEn : t.reviewTitleAr}
               </h3>
 
@@ -495,36 +498,36 @@ export default function CheckoutView() {
               <div className="p-4 bg-brand-cream/60 rounded-2xl border border-brand-sage-light/25 space-y-3.5">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <span className="text-[9px] text-zinc-400 uppercase tracking-wider font-bold block">Contact Customer:</span>
-                    <span className="font-semibold text-zinc-800 text-xs">{customerName} ({customerPhone})</span>
+                    <span className="text-[9px] text-brand-sage-muted uppercase tracking-wider font-bold block">Contact Customer:</span>
+                    <span className="font-semibold text-brand-primary text-xs">{customerName} ({customerPhone})</span>
                   </div>
                   <div>
-                    <span className="text-[9px] text-zinc-400 uppercase tracking-wider font-bold block">Mail Receipt:</span>
-                    <span className="font-semibold text-zinc-800 text-xs">{customerEmail}</span>
+                    <span className="text-[9px] text-brand-sage-muted uppercase tracking-wider font-bold block">Mail Receipt:</span>
+                    <span className="font-semibold text-brand-primary text-xs">{customerEmail}</span>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 pt-2.5 border-t border-brand-sage-light/10">
                   <div>
-                    <span className="text-[9px] text-zinc-400 uppercase tracking-wider font-bold block">Destination Location:</span>
-                    <span className="font-semibold text-zinc-800 text-xs">{shippingLine1}, {shippingCity}, {shippingCountry}</span>
+                    <span className="text-[9px] text-brand-sage-muted uppercase tracking-wider font-bold block">Destination Location:</span>
+                    <span className="font-semibold text-brand-primary text-xs">{shippingLine1}, {shippingCity}, {shippingCountry}</span>
                   </div>
                   <div>
-                    <span className="text-[9px] text-zinc-400 uppercase tracking-wider font-bold block">Authorization Method:</span>
-                    <span className="font-semibold text-zinc-800 text-xs uppercase">{paymentMethod === 'cod' ? 'Cash on Delivery' : 'Encrypted Card'}</span>
+                    <span className="text-[9px] text-brand-sage-muted uppercase tracking-wider font-bold block">Authorization Method:</span>
+                    <span className="font-semibold text-brand-primary text-xs uppercase">{paymentMethod === 'cod' ? 'Cash on Delivery' : 'Encrypted Card'}</span>
                   </div>
                 </div>
               </div>
 
-              <div className="p-4 bg-zinc-50 border border-zinc-200 rounded-2xl space-y-1">
-                <p className="text-[10px] text-zinc-500 font-sans leading-relaxed">
+              <div className="p-4 bg-brand-cream/30 border border-brand-sage-light/15 rounded-2xl space-y-1">
+                <p className="text-[10px] text-brand-sage-muted font-sans leading-relaxed">
                   {language === 'en' ? t.termsEn : t.termsAr}
                 </p>
               </div>
 
               <button
                 onClick={handlePlaceOrderSubmit}
-                className="w-full bg-brand-primary hover:bg-brand-secondary text-brand-cream py-4 rounded-xl text-xs uppercase tracking-widest font-bold text-center transition-theme cursor-pointer flex items-center justify-center space-x-1.5"
+                className="btn-primary w-full !py-4"
               >
                 <ShieldCheck size={14} />
                 <span>{language === 'en' ? t.placeBtnEn : t.placeBtnAr}</span>
@@ -534,11 +537,11 @@ export default function CheckoutView() {
 
           {/* Stepper buttons (prev/next) for non-final steps */}
           {step < 4 && (
-            <div className={`flex justify-between items-center pt-4 border-t border-zinc-100`}>
+            <div className={`flex justify-between items-center pt-4 border-t border-brand-sage-light/10`}>
               {step > 1 ? (
                 <button
                   onClick={handlePrevStep}
-                  className="text-xs font-semibold uppercase tracking-wider text-zinc-500 hover:text-brand-primary flex items-center gap-1 cursor-pointer"
+                  className="text-xs font-semibold uppercase tracking-wider text-brand-sage-muted hover:text-brand-primary flex items-center gap-1 cursor-pointer transition-colors"
                 >
                   <ArrowLeft size={12} className="rtl:rotate-180" />
                   <span>{language === 'en' ? t.prevEn : t.prevAr}</span>
@@ -549,7 +552,7 @@ export default function CheckoutView() {
 
               <button
                 onClick={handleNextStep}
-                className="bg-brand-primary hover:bg-brand-secondary text-brand-cream font-bold rounded-xl text-xs py-3.5 px-6 uppercase tracking-wider cursor-pointer flex items-center gap-1"
+                className="btn-primary !py-3 !px-6"
               >
                 <span>{language === 'en' ? t.nextEn : t.nextAr}</span>
                 <ArrowRight size={12} className="rtl:rotate-180" />
@@ -561,20 +564,20 @@ export default function CheckoutView() {
 
         {/* RIGHT STICKY COMPONENT: RECEIPT SUMMARY */}
         <div className="lg:col-span-4 space-y-6">
-          <div className="bg-white rounded-3xl p-5 border border-brand-sage-light/10 shadow-xs space-y-4">
-            <h3 className="font-serif text-sm font-bold text-zinc-900 border-b border-zinc-50 pb-2 flex items-center">
-              <ShoppingBag className="mr-1.5 rtl:ml-1.5 text-brand-sage-muted" size={16} />
+          <div className="card-base bg-white p-5 !rounded-xl space-y-4">
+            <h3 className="font-serif text-sm font-bold text-brand-primary border-b border-brand-sage-light/10 pb-2 flex items-center">
+              <ShoppingBag className="mr-2 rtl:ml-2 text-brand-sage-muted" size={16} />
               {language === 'en' ? t.summaryTitleEn : t.summaryTitleAr}
             </h3>
 
             {/* List mini products card scrolling list */}
             <div className="max-h-72 overflow-y-auto space-y-3.5 pr-2">
               {cart.map((item) => (
-                <div key={item.id} className="flex space-x-3 rtl:space-x-reverse items-center pb-2 border-b border-zinc-50">
-                  <img src={item.product.image} alt="" className="w-10 h-12 object-cover rounded bg-zinc-50 p-0.5" />
+                <div key={item.id} className="flex space-x-3 rtl:space-x-reverse items-center pb-2 border-b border-brand-sage-light/10">
+                  <img src={item.product.image} alt="" className="w-10 h-12 object-cover rounded bg-brand-cream/30 p-0.5 border border-brand-sage-light/10" />
                   <div className="flex-1 min-w-0 font-sans text-xs">
-                    <h5 className="font-serif font-bold text-zinc-800 truncate m-0">{language === 'en' ? item.product.nameEn : item.product.nameAr}</h5>
-                    <span className="text-[10px] text-zinc-400 block">{item.quantity} x {item.selectedSize}</span>
+                    <h5 className="font-serif font-bold text-zinc-900 truncate m-0">{language === 'en' ? item.product.nameEn : item.product.nameAr}</h5>
+                    <span className="text-[10px] text-brand-sage-muted block mt-0.5">{item.quantity} x {item.selectedSize}</span>
                   </div>
                   <span className="text-xs font-bold text-brand-primary font-sans">
                     {(item.product.discountPrice ?? item.product.price) * item.quantity} {t.aed}
@@ -584,13 +587,13 @@ export default function CheckoutView() {
             </div>
 
             {/* Price additions summaries */}
-            <div className="space-y-2 pb-3 pt-2 text-xs font-sans text-zinc-500 border-b border-zinc-100">
+            <div className="space-y-2.5 pb-3 pt-2 text-xs font-sans text-brand-sage-muted border-b border-brand-sage-light/10">
               <div className="flex justify-between">
                 <span>{language === 'en' ? t.subtotalEn : t.subtotalAr}</span>
-                <span>{currentSubtotal} {t.aed}</span>
+                <span className="text-zinc-900 font-semibold">{currentSubtotal} {t.aed}</span>
               </div>
               {appliedCoupon && (
-                <div className="flex justify-between text-red-600">
+                <div className="flex justify-between text-red-650">
                   <span>{language === 'en' ? t.discountEn : t.discountAr} ({appliedCoupon.code})</span>
                   <span>-{discountAmount} {t.aed}</span>
                 </div>
@@ -601,7 +604,7 @@ export default function CheckoutView() {
                   {shippingFee === 0 ? (
                     <span className="font-bold text-emerald-600">{language === 'en' ? t.freeEn : t.freeAr}</span>
                   ) : (
-                    `${shippingFee} ${t.aed}`
+                    <span className="text-zinc-900 font-semibold">{shippingFee} {t.aed}</span>
                   )}
                 </span>
               </div>

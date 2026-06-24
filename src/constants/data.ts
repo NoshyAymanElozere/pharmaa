@@ -1,4 +1,4 @@
-import { Category, Product, Review, Coupon } from '../types';
+import { Category, Product, Review, Coupon, Bundle } from '../types';
 
 export const CATEGORIES: Category[] = [
   {
@@ -26,7 +26,7 @@ export const CATEGORIES: Category[] = [
     nameAr: 'المرطبات والكريمات',
     descriptionEn: 'Rich infusions to lock in deep hydration, rebuilding the lipid barrier.',
     descriptionAr: 'تركيبات غنية لحبس الترطيب داخل خلايا البشرة وإعادة بناء حاجز الحماية الطبيعي.',
-    image: '/src/assets/images/product_cream_jar_1781217540516.jpg'
+    image: '/assets/images/product_cream_jar_1781217540516.jpg'
   },
   {
     id: 'cat_sunscreens',
@@ -88,9 +88,9 @@ export const PRODUCTS: Product[] = [
     rating: 4.9,
     reviewCount: 148,
     size: '50ml',
-    image: '/src/assets/images/hero_skincare_banner_1781217525355.jpg',
+    image: '/assets/images/hero_skincare_banner_1781217525355.jpg',
     galleryImages: [
-      '/src/assets/images/hero_skincare_banner_1781217525355.jpg',
+      '/assets/images/hero_skincare_banner_1781217525355.jpg',
       'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=600&q=80',
       'https://images.unsplash.com/photo-1608248597481-496100c80836?auto=format&fit=crop&w=600&q=80'
     ],
@@ -128,9 +128,9 @@ export const PRODUCTS: Product[] = [
     rating: 4.8,
     reviewCount: 92,
     size: '100ml',
-    image: '/src/assets/images/product_cream_jar_1781217540516.jpg',
+    image: '/assets/images/product_cream_jar_1781217540516.jpg',
     galleryImages: [
-      '/src/assets/images/product_cream_jar_1781217540516.jpg',
+      '/assets/images/product_cream_jar_1781217540516.jpg',
       'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?auto=format&fit=crop&w=600&q=80',
       'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=600&q=80'
     ],
@@ -370,3 +370,141 @@ export const COUPONS: Coupon[] = [
     descriptionAr: 'عرض خاص للعملاء الجدد! وفري 10٪ على أي منتج إكسير بشرة فردي.'
   }
 ];
+
+export const BUNDLES: Bundle[] = [
+  {
+    id: 'bundle_hydration_duo',
+    slug: 'dewy-hydration-duo',
+    nameEn: 'The Dewy Hydration Duo',
+    nameAr: 'ثنائي الترطيب المتوهج',
+    subtitleEn: 'Double-action moisture lock with Oceanic Serum & Barrier Cream',
+    subtitleAr: 'قفل ترطيب مزدوج المفعول مع سيروم المحيط وكريم حاجز البشرة',
+    descriptionEn: 'The ultimate skin-quenching couple. This duo works in tandem: the Hydra-Renewal Serum floods skin cells with moisture, while the Velvet Cloud Barrier Cream locks it in and seals the skin barrier for a plump, velvet finish.',
+    descriptionAr: 'الثنائي المثالي لترطيب وتغذية الخلايا. يعمل هذا الزوج جنباً إلى جنب: سيروم تجديد البشرة يغمر خلايا الجلد بالرطوبة الفائقة، بينما يعمل كريم الحاجز المخملي على قفل الترطيب وترميم الطبقة الدهنية الواقية.',
+    image: '/assets/images/hero_skincare_banner_1781217525355.jpg',
+    discountPercentage: 15,
+    originalPrice: 700,
+    bundlePrice: 595,
+    benefitsEn: [
+      'Boosts skin moisture levels by 85% in 3 days',
+      'Provides a perfect glass-skin makeup canvas',
+      'Repairs compromised lipid barriers overnight'
+    ],
+    benefitsAr: [
+      'يرفع مستويات ترطيب البشرة بنسبة 85٪ في 3 أيام',
+      'يمنحكِ بشرة زجاجية مثالية كقاعدة للمكياج',
+      'يرمم حاجز الدهون المتضرر طوال فترة النوم ليلاً'
+    ],
+    items: [
+      {
+        product: PRODUCTS[0],
+        stepEn: 'Step 1: Deep Hydra-Renewal',
+        stepAr: 'الخطوة 1: تجديد الترطيب العميق',
+        benefitEn: 'Plumps skin with dual-weight hyaluronic acid molecules.',
+        benefitAr: 'يملأ خلايا البشرة بجزيئات حمض الهيالورونيك ثنائية الوزن.'
+      },
+      {
+        product: PRODUCTS[1],
+        stepEn: 'Step 2: Seal & Protect Barrier',
+        stepAr: 'الخطوة 2: قفل الترطيب وحماية الحاجز',
+        benefitEn: 'Binds moisture and fills lipid voids with ceramides.',
+        benefitAr: 'يربط جزيئات الماء داخل الخلايا ويسد الثغرات الدهنية بالسيراميد.'
+      }
+    ]
+  },
+  {
+    id: 'bundle_complete_renewal',
+    slug: 'ultimate-restoration-routine',
+    nameEn: 'The Ultimate Restoration Routine',
+    nameAr: 'روتين الترميم الفائق المتكامل',
+    subtitleEn: 'The full 4-step professional clinical routine for ultimate skin health',
+    subtitleAr: 'الروتين السريري المهني المتكامل من 4 خطوات لصحّة البشرة الفائقة',
+    descriptionEn: 'Transform your daily ritual with our flagship routine. Designed as a synergistic four-step process to cleanse, treat, hydrate, and shield your skin against aging elements and environmental pollutants.',
+    descriptionAr: 'حوّلي روتينكِ اليومي مع مجموعتنا الرائدة. مصممة كعملية متكاملة تآزرية من أربع خطوات لتنظيف، علاج، ترطيب، وحماية بشرتكِ من علامات الشيخوخة والملوثات البيئية.',
+    image: '/assets/images/product_cream_jar_1781217540516.jpg',
+    discountPercentage: 20,
+    originalPrice: 1145,
+    bundlePrice: 915,
+    benefitsEn: [
+      'Comprehensive skincare from morning cleanse to night restoration',
+      'Fades fine lines, redness, and sun damage within 14 days',
+      'Reinforces natural microflora and blocks UV damage'
+    ],
+    benefitsAr: [
+      'عناية شاملة بالبشرة تبدأ من غسول الصباح وحتى ترميم الليل',
+      'يخفي الخطوط الدقيقة والاحمرار وبقع الشمس في 14 يوماً',
+      'يقوي البكتيريا الحيوية النافعة ويحجب أضرار الأشعة فوق البنفسجية'
+    ],
+    items: [
+      {
+        product: PRODUCTS[2],
+        stepEn: 'Step 1: Cleanse',
+        stepAr: 'الخطوة 1: التنظيف اللطيف',
+        benefitEn: 'Purifies skin of pollutants without stripping natural moisture.',
+        benefitAr: 'ينظف البشرة بلطف من الملوثات والأتربة مع الحفاظ على ترطيبها.'
+      },
+      {
+        product: PRODUCTS[0],
+        stepEn: 'Step 2: Hydro-Infusion',
+        stepAr: 'الخطوة 2: غمر الترطيب السيرومي',
+        benefitEn: 'Provides rich oceanic seaweed nutrients and deep moisture.',
+        benefitAr: 'يمنح البشرة عناصر الطحالب البحرية المغذية وترطيباً فائقاً.'
+      },
+      {
+        product: PRODUCTS[1],
+        stepEn: 'Step 3: Nourish & Rebuild',
+        stepAr: 'الخطوة 3: التغذية وإعادة البناء',
+        benefitEn: 'Delivers ceramides and squalane to repair skin lipids.',
+        benefitAr: 'يغذي طبقات الجلد بالسيراميد والسكوالين لإعادة بناء الدهون.'
+      },
+      {
+        product: PRODUCTS[3],
+        stepEn: 'Step 4: Shield SPF 50+',
+        stepAr: 'الخطوة 4: درع الحماية SPF 50+',
+        benefitEn: 'Invisible mineral shield blocking UVA/UVB photo-aging.',
+        benefitAr: 'درع معدني غير مرئي يحمي من أضرار الشمس والشيخوخة الضوئية.'
+      }
+    ]
+  },
+  {
+    id: 'bundle_clear_skin',
+    slug: 'clear-skin-clarifying-set',
+    nameEn: 'The Clear Skin Clarifying Set',
+    nameAr: 'مجموعة تنقية وتصفية البشرة',
+    subtitleEn: 'Weekly detoxifying and balancing duo for clear, dynamic skin',
+    subtitleAr: 'ثنائي أسبوعي لتنقية السموم وتصفية وتوازن إفراز دهون البشرة',
+    descriptionEn: 'Perfect for skin prone to congestion or excessive oiliness. The prebiotic cleanser keeps daily sebum balanced, while the Glacial Marine Clay Mask acts as a weekly vacuum to clean pores and restore clarity.',
+    descriptionAr: 'مثالي للبشرة المعرضة لانسداد المسام أو الإفرازات الدهنية الزائدة. يحافظ غسول البريبايوتك على توازن الدهون اليومي، بينما يعمل قناع الطين الكندي كمكنسة لتنقية المسام واستعادة إشراقة وجهكِ.',
+    image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=600&q=80',
+    discountPercentage: 15,
+    originalPrice: 475,
+    bundlePrice: 400,
+    benefitsEn: [
+      'Cleanses blackheads and reduces visible pore size',
+      'Controls excessive midday oil production',
+      'Provides weekly spa-grade colloidal mud purification'
+    ],
+    benefitsAr: [
+      'ينظف الرؤوس السوداء ويقلل من القطر المرئي للمسامات الواسعة',
+      'يتحكم في إفرازات الزيوت والدهون المزعجة في منتصف النهار',
+      'يوفر تنقية أسبوعية احترافية بـقوة الطين الغرواني البحري'
+    ],
+    items: [
+      {
+        product: PRODUCTS[2],
+        stepEn: 'Daily Cleanse: Botanical Gel',
+        stepAr: 'تنظيف يومي: جل نباتي متوازن',
+        benefitEn: 'Maintains prebiotic defense skin flora and extracts debris.',
+        benefitAr: 'يحافظ على البكتيريا الدفاعية المفيدة ويزيل الأتربة اليومية.'
+      },
+      {
+        product: PRODUCTS[4],
+        stepEn: 'Weekly Detox: Marine Clay',
+        stepAr: 'تقشير أسبوعي: قناع الطين البحري',
+        benefitEn: 'Vacuums dead cells and tightens skin surfaces.',
+        benefitAr: 'يسحب الخلايا الميتة والسموم ويشد المسامات المرتخية.'
+      }
+    ]
+  }
+];
+

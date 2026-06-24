@@ -1,7 +1,17 @@
+"use client";
+
 import React, { useState } from 'react';
 import { useApp } from '../../store/AppContext';
-import { ShoppingBag, Heart, User, Search, Globe, X, Plus, Minus, Trash2 } from 'lucide-react';
+import { ShoppingBag, Heart, User, Search, Globe, X, Plus, Minus, Trash2, Menu } from 'lucide-react';
 import { CATEGORIES } from '../../constants/data';
+
+const BrandLogo = () => (
+  <img
+    src="/assets/images/Logo.png"
+    alt="AURA Laboratories"
+    className="h-16 md:h-20 w-auto object-contain transition-transform duration-300 hover:scale-105"
+  />
+);
 
 export default function Header() {
   const {
@@ -25,6 +35,7 @@ export default function Header() {
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMiniCartOpen, setIsMiniCartOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [localSearch, setLocalSearch] = useState('');
 
   // Translations
@@ -86,152 +97,168 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-brand-cream/95 backdrop-blur-md border-b border-brand-sage-light/20 shadow-sm transition-all">
-      {/* Top Banner Alert */}
-      <div className="w-full bg-brand-primary text-brand-cream py-2 px-4 text-center text-xs tracking-wider uppercase font-medium">
-        {t.freeShipping}
-      </div>
+    <>
+      <header className="fixed top-0 left-0 right-0 z-50 w-full bg-brand-cream/95 backdrop-blur-md border-b border-brand-primary/10 shadow-sm transition-all duration-300">
+        {/* Desktop view header row */}
+        <div className="hidden md:flex max-w-7xl mx-auto px-6 sm:px-8 h-24 items-center justify-between w-full">
+          {/* Left Side: Brand Logo */}
+          <div className="flex items-center space-x-2.5 rtl:space-x-reverse cursor-pointer" onClick={() => setActivePage('home')}>
+            <BrandLogo />
+          </div>
 
-      {/* Main Navbar Navigation */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-        
-        {/* Left Links (Desktop) */}
-        <div className="hidden md:flex items-center space-x-8 rtl:space-x-reverse">
-          <button
-            onClick={() => setActivePage('home')}
-            className={`font-sans text-sm tracking-wide transition-colors duration-200 cursor-pointer ${
-              activePage === 'home' ? 'text-brand-primary font-semibold underline underline-offset-8 decoration-brand-sage-muted' : 'text-zinc-600 hover:text-brand-primary'
-            }`}
-          >
-            {t.navHome}
-          </button>
-          <button
-            onClick={() => {
-              setSearchQuery('');
-              setActivePage('shop');
-            }}
-            className={`font-sans text-sm tracking-wide transition-colors duration-200 cursor-pointer ${
-              activePage === 'shop' ? 'text-brand-primary font-semibold underline underline-offset-8 decoration-brand-sage-muted' : 'text-zinc-600 hover:text-brand-primary'
-            }`}
-          >
-            {t.navShop}
-          </button>
-          <button
-            onClick={() => setActivePage('developer-specs')}
-            className={`font-sans text-xs tracking-wider uppercase bg-brand-sage-light/30 px-3 py-1.5 rounded-full border border-brand-sage-muted/20 text-brand-primary font-medium hover:bg-brand-sage-light/50 transition-colors cursor-pointer`}
-          >
-            {t.navSpecs}
-          </button>
+          {/* Center: Navigation Links */}
+          <div className="hidden md:flex items-center space-x-6 lg:space-x-8 rtl:space-x-reverse text-brand-primary font-medium">
+            <button
+              onClick={() => setActivePage('home')}
+              className={`relative py-1.5 font-sans text-xs uppercase tracking-widest font-semibold transition-all duration-300 cursor-pointer text-brand-primary/70 hover:text-brand-primary after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1.5px] after:bg-brand-primary after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-center ${activePage === 'home' ? 'text-brand-primary after:scale-x-100' : ''
+                }`}
+            >
+              {language === 'en' ? 'Home' : 'الرئيسية'}
+            </button>
+
+            <button
+              onClick={() => setActivePage('shop')}
+              className={`relative py-1.5 font-sans text-xs uppercase tracking-widest font-semibold transition-all duration-300 cursor-pointer text-brand-primary/70 hover:text-brand-primary after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1.5px] after:bg-brand-primary after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-center ${activePage === 'shop' ? 'text-brand-primary after:scale-x-100' : ''
+                }`}
+            >
+              {language === 'en' ? 'Shop' : 'المتجر'}
+            </button>
+
+            <button
+              onClick={() => setActivePage('bundles')}
+              className={`relative py-1.5 font-sans text-xs uppercase tracking-widest font-semibold transition-all duration-300 cursor-pointer text-brand-primary/70 hover:text-brand-primary after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1.5px] after:bg-brand-primary after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-center ${activePage === 'bundles' ? 'text-brand-primary after:scale-x-100' : ''
+                }`}
+            >
+              {language === 'en' ? 'Bundles' : 'الباقات'}
+            </button>
+
+
+            <button
+              onClick={() => setActivePage('developer-specs')}
+              className={`relative py-1.5 font-sans text-xs uppercase tracking-widest font-semibold transition-all duration-300 cursor-pointer text-brand-primary/70 hover:text-brand-primary after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1.5px] after:bg-brand-primary after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-center ${activePage === 'developer-specs' ? 'text-brand-primary after:scale-x-100' : ''
+                }`}
+            >
+              {language === 'en' ? 'Specs' : 'المواصفات'}
+            </button>
+          </div>
+
+          {/* Right Side: Circular utility buttons */}
+          <div className="flex items-center space-x-2.5 rtl:space-x-reverse">
+            {/* User Profile Circular Button */}
+            <button
+              onClick={() => setActivePage(user ? 'profile' : 'auth')}
+              className="w-10 h-10 rounded-full hover:bg-brand-primary text-brand-primary hover:text-brand-cream flex items-center justify-center transition-all duration-300 cursor-pointer relative shadow-sm hover:scale-105 active:scale-95"
+              aria-label="User Account"
+            >
+              <User size={18} className="transition-colors duration-300" />
+            </button>
+
+            {/* Cart Circular Button */}
+            <button
+              onClick={() => setIsMiniCartOpen(true)}
+              className="w-10 h-10 rounded-full hover:bg-brand-primary text-brand-primary hover:text-brand-cream flex items-center justify-center transition-all duration-300 cursor-pointer relative shadow-sm hover:scale-105 active:scale-95"
+              aria-label="Shopping Cart"
+            >
+              <ShoppingBag size={18} className="transition-colors duration-300" />
+              {cart.length > 0 && (
+                <span className="absolute top-1 right-1 bg-brand-secondary text-brand-cream text-[9px] w-4.5 h-4.5 rounded-full flex items-center justify-center font-bold font-sans animate-pulse">
+                  {cart.reduce((sum, item) => sum + item.quantity, 0)}
+                </span>
+              )}
+            </button>
+
+            {/* Wishlist Circular Button */}
+            <button
+              onClick={() => setActivePage('wishlist')}
+              className="w-10 h-10 rounded-full hover:bg-brand-primary text-brand-primary hover:text-brand-cream flex items-center justify-center transition-all duration-300 cursor-pointer relative shadow-sm hover:scale-105 active:scale-95"
+              aria-label="Wishlist"
+            >
+              <Heart size={18} className={`transition-colors duration-300 ${activePage === 'wishlist' ? 'fill-brand-secondary text-brand-secondary' : ''}`} />
+              {wishlist.length > 0 && (
+                <span className="absolute top-1 right-1 bg-brand-secondary text-brand-cream text-[9px] w-4.5 h-4.5 rounded-full flex items-center justify-center font-semibold font-sans">
+                  {wishlist.length}
+                </span>
+              )}
+            </button>
+
+            {/* Search Circular Button */}
+            <button
+              onClick={() => {
+                setIsSearchOpen(true);
+                setLocalSearch(searchQuery);
+              }}
+              className="w-10 h-10 rounded-full hover:bg-brand-primary text-brand-primary hover:text-brand-cream flex items-center justify-center transition-all duration-300 cursor-pointer shadow-sm hover:scale-105 active:scale-95"
+              aria-label="Search"
+            >
+              <Search size={18} className="transition-colors duration-300" />
+            </button>
+
+            {/* Universal Language Toggler */}
+            <button
+              onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')}
+              className="px-3.5 h-10 rounded-full border border-brand-primary/10 hover:border-brand-primary hover:bg-brand-primary hover:text-brand-cream text-brand-primary flex items-center space-x-1.5 rtl:space-x-reverse transition-all duration-300 cursor-pointer text-xs font-semibold shadow-sm hover:scale-105 active:scale-95"
+              title="Switch Language"
+            >
+              <Globe size={14} className="transition-colors duration-300" />
+              <span className="text-[10px] font-bold font-sans">{language === 'en' ? 'العربية' : 'EN'}</span>
+            </button>
+          </div>
         </div>
 
-        {/* Brand center logo */}
-        <div className="flex flex-col items-center justify-center cursor-pointer" onClick={() => setActivePage('home')}>
-          <span className="font-serif text-3xl font-semibold tracking-widest text-brand-primary">
-            {t.brandName}
-          </span>
-          <span className="font-sans text-[8px] tracking-[0.4em] text-brand-sage-muted -mt-1">
-            {t.brandSub}
-          </span>
+        {/* Mobile view header row */}
+        <div className="md:hidden flex items-center justify-between px-6 h-16 w-full">
+          <div className="flex items-center space-x-3 rtl:space-x-reverse">
+            {/* Hamburger Menu Icon */}
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="w-9 h-9 rounded-full hover:bg-brand-primary text-brand-primary hover:text-brand-cream flex items-center justify-center cursor-pointer shadow-sm transition-all duration-300"
+              aria-label="Toggle Mobile Menu"
+            >
+              <Menu size={18} />
+            </button>
+            
+            {/* Brand Logo */}
+            <div className="cursor-pointer flex items-center animate-fade-in" onClick={() => setActivePage('home')}>
+              <BrandLogo />
+            </div>
+          </div>
+
+          {/* Right Side: Cart & Search */}
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setIsMiniCartOpen(true)}
+              className="w-9 h-9 rounded-full hover:bg-brand-primary text-brand-primary hover:text-brand-cream flex items-center justify-center cursor-pointer relative shadow-sm transition-all duration-300"
+            >
+              <ShoppingBag size={16} className="transition-colors duration-300" />
+              {cart.length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-brand-secondary text-brand-cream text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+                  {cart.reduce((sum, item) => sum + item.quantity, 0)}
+                </span>
+              )}
+            </button>
+
+            <button
+              onClick={() => setIsSearchOpen(true)}
+              className="w-9 h-9 rounded-full hover:bg-brand-primary text-brand-primary hover:text-brand-cream flex items-center justify-center cursor-pointer shadow-sm transition-all duration-300"
+            >
+              <Search size={16} className="transition-colors duration-300" />
+            </button>
+
+            <button
+              onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')}
+              className="px-2.5 h-9 rounded-full border border-brand-primary/10 hover:border-brand-primary hover:bg-brand-primary hover:text-brand-cream text-brand-primary flex items-center space-x-1 transition-all duration-300 text-[8px] font-bold shadow-sm"
+            >
+              <Globe size={10} className="transition-colors duration-300" />
+              <span>{language === 'en' ? 'العربية' : 'EN'}</span>
+            </button>
+          </div>
         </div>
-
-        {/* Right utility elements (Search, Languages, Profile, Cart, Wishlist, Mobile menu) */}
-        <div className="flex items-center space-x-4 sm:space-x-6 rtl:space-x-reverse">
-          
-          {/* Universal Language Toggler */}
-          <button
-            onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')}
-            className="flex items-center space-x-1 text-zinc-600 hover:text-brand-primary text-xs font-semibold tracking-wider bg-zinc-100 hover:bg-brand-sage-light/20 px-2.5 py-1.5 rounded-lg border border-zinc-200 transition-colors cursor-pointer"
-            title="Switch Language"
-          >
-            <Globe size={14} />
-            <span className="font-sans">{language === 'en' ? 'العربية' : 'EN'}</span>
-          </button>
-
-          {/* Search Trigger Icon */}
-          <button
-            onClick={() => {
-              setIsSearchOpen(true);
-              setLocalSearch(searchQuery);
-            }}
-            className="text-zinc-600 hover:text-brand-primary transition-colors p-1 cursor-pointer"
-            aria-label="Search"
-          >
-            <Search size={20} />
-          </button>
-
-          {/* Wishlist Icon */}
-          <button
-            onClick={() => setActivePage('wishlist')}
-            className="relative text-zinc-600 hover:text-brand-primary transition-colors p-1 cursor-pointer"
-            aria-label="Wishlist"
-          >
-            <Heart size={20} className={activePage === 'wishlist' ? 'fill-brand-sage-muted text-brand-sage-muted' : ''} />
-            {wishlist.length > 0 && (
-              <span className="absolute -top-1 -right-1 bg-brand-sage-muted text-brand-cream text-[9px] w-4.5 h-4.5 rounded-full flex items-center justify-center font-semibold font-sans">
-                {wishlist.length}
-              </span>
-            )}
-          </button>
-
-          {/* Profile Access */}
-          <button
-            onClick={() => setActivePage(user ? 'profile' : 'auth')}
-            className="text-zinc-600 hover:text-brand-primary transition-colors p-1 flex items-center space-x-1.5 rtl:space-x-reverse cursor-pointer"
-            aria-label="User Account"
-          >
-            <User size={20} className={activePage === 'profile' || activePage === 'auth' ? 'text-brand-primary' : ''} />
-            {user && (
-              <span className="hidden lg:inline text-xs font-medium text-zinc-700 font-sans max-w-[80px] truncate">
-                {user.name.split(' ')[0]}
-              </span>
-            )}
-          </button>
-
-          {/* Luxury Mini Cart Trigger */}
-          <button
-            onClick={() => setIsMiniCartOpen(true)}
-            className="relative text-zinc-600 hover:text-brand-primary transition-colors p-1 bg-brand-primary text-brand-cream rounded-full w-9 h-9 flex items-center justify-center cursor-pointer hover:bg-brand-secondary"
-            aria-label="Shopping Cart"
-          >
-            <ShoppingBag size={17} />
-            {cart.length > 0 && (
-              <span className="absolute -top-1 -right-1 bg-brand-sage-light text-brand-primary text-[9px] w-4.5 h-4.5 rounded-full flex items-center justify-center font-bold font-sans animate-pulse">
-                {cart.reduce((sum, item) => sum + item.quantity, 0)}
-              </span>
-            )}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Nav Links */}
-      <div className="md:hidden flex justify-center space-x-6 rtl:space-x-reverse border-t border-brand-sage-light/10 bg-brand-cream/40 py-2.5 px-4">
-        <button
-          onClick={() => setActivePage('home')}
-          className={`text-xs uppercase tracking-wider font-sans ${activePage === 'home' ? 'text-brand-primary font-semibold' : 'text-zinc-500'}`}
-        >
-          {t.navHome}
-        </button>
-        <button
-          onClick={() => {
-            setSearchQuery('');
-            setActivePage('shop');
-          }}
-          className={`text-xs uppercase tracking-wider font-sans ${activePage === 'shop' ? 'text-brand-primary font-semibold' : 'text-zinc-500'}`}
-        >
-          {t.navShop}
-        </button>
-        <button
-          onClick={() => setActivePage('developer-specs')}
-          className={`text-[10px] uppercase tracking-wide font-sans bg-brand-sage-light/20 px-2 py-0.5 rounded text-brand-primary ${activePage === 'developer-specs' ? 'border border-brand-sage-muted' : ''}`}
-        >
-          {language === 'en' ? 'Specs Guide' : 'المواصفات'}
-        </button>
-      </div>
+      </header>
 
       {/* ADVANCED FULL-SCREEN SEARCH MODAL OVERLAY */}
       {isSearchOpen && (
-        <div className="fixed inset-0 z-50 bg-brand-primary/60 backdrop-blur-sm flex items-start justify-center pt-24 px-4">
-          <div className="w-full max-w-2xl bg-brand-cream rounded-2xl shadow-2xl p-6 border border-brand-sage-light/30 animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 bg-brand-primary/50 backdrop-blur-md flex items-start justify-center pt-20 md:pt-28 px-4">
+          <div className="w-full max-w-2xl bg-white rounded-2xl shadow-2xl p-6 sm:p-8 border border-brand-sage-light/15 animate-fade-in">
             <div className="flex items-center justify-between pb-4 border-b border-brand-sage-light/20">
               <span className="font-serif text-lg font-bold text-brand-primary">
                 {language === 'en' ? 'Interactive Search Center' : 'مركز البحث التفاعلي'}
@@ -251,7 +278,7 @@ export default function Header() {
                 placeholder={t.searchPlaceholder}
                 value={localSearch}
                 onChange={(e) => setLocalSearch(e.target.value)}
-                className="w-full bg-zinc-50 border border-brand-sage-light/50 focus:border-brand-primary focus:outline-none rounded-xl py-3.5 pl-11 pr-4 rtl:pr-11 rtl:pl-4 text-sm font-sans placeholder:text-zinc-400 text-zinc-800 shadow-inner"
+                className="input-field pl-11 pr-4 rtl:pr-11 rtl:pl-4 !py-3.5 !text-sm !rounded-xl"
               />
               <Search className="absolute left-4 rtl:right-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
               {localSearch && (
@@ -326,11 +353,17 @@ export default function Header() {
 
       {/* PREMIUM SLIDING SIDEBAR MINI-CART DRAWER */}
       {isMiniCartOpen && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex justify-end">
+        <div className="fixed inset-0 z-50 flex justify-end">
           {/* Backdrop Click Dismiss */}
-          <div className="absolute inset-0" onClick={() => setIsMiniCartOpen(false)} />
+          <div
+            className="absolute inset-0 bg-brand-primary/40 backdrop-blur-xs transition-opacity"
+            onClick={() => setIsMiniCartOpen(false)}
+          />
 
-          <div className="relative w-full max-w-md h-full bg-brand-cream shadow-2xl flex flex-col z-10 border-l border-brand-sage-light/20 animate-in slide-in-from-right duration-300">
+          <div
+            className="relative w-full max-w-md h-full bg-white shadow-2xl flex flex-col z-10 border-l border-brand-sage-light/15 animate-in slide-in-from-right duration-300"
+            style={{ backgroundColor: '#ffffff' }}
+          >
             {/* Header */}
             <div className="p-6 border-b border-brand-sage-light/20 flex items-center justify-between">
               <div className="flex items-center space-x-2.5 rtl:space-x-reverse">
@@ -353,12 +386,12 @@ export default function Header() {
                 cart.map((item) => (
                   <div
                     key={item.id}
-                    className="flex space-x-4 rtl:space-x-reverse pb-4 border-b border-brand-sage-light/10"
+                    className="flex space-x-4 rtl:space-x-reverse pb-4 border-b border-brand-sage-light/10 animate-fade-in"
                   >
                     <img
                       src={item.product.image}
                       alt={item.product.nameEn}
-                      className="w-16 h-20 rounded-lg object-cover bg-white-50 border border-brand-sage-light/20 p-0.5"
+                      className="w-16 h-20 rounded-xl object-cover bg-brand-cream/50 border border-brand-sage-light/15 p-0.5"
                     />
 
                     <div className="flex-1 min-w-0">
@@ -430,7 +463,10 @@ export default function Header() {
 
             {/* Footer Summary (if products added) */}
             {cart.length > 0 && (
-              <div className="p-6 border-t border-brand-sage-light/20 bg-zinc-50 rounded-t-2xl space-y-4">
+              <div
+                className="p-6 border-t border-brand-sage-light/20 space-y-4"
+                style={{ backgroundColor: '#F4F2E4' }}
+              >
                 <div className="space-y-1.5">
                   <div className="flex justify-between text-xs text-zinc-500 font-sans">
                     <span>{t.subtotal}</span>
@@ -454,7 +490,7 @@ export default function Header() {
                       setIsMiniCartOpen(false);
                       setActivePage('cart');
                     }}
-                    className="w-full bg-white border border-brand-sage-muted text-brand-primary py-3 rounded-xl text-[10px] tracking-wider uppercase font-bold text-center hover:bg-brand-cream transition-theme cursor-pointer"
+                    className="btn-secondary !py-3 !text-[10px] w-full !rounded-xl"
                   >
                     {t.viewCart}
                   </button>
@@ -463,7 +499,7 @@ export default function Header() {
                       setIsMiniCartOpen(false);
                       setActivePage('checkout');
                     }}
-                    className="w-full bg-brand-primary text-brand-cream py-3 rounded-xl text-[10px] tracking-wider uppercase font-bold text-center hover:bg-brand-secondary transition-theme cursor-pointer"
+                    className="btn-primary !py-3 !text-[10px] w-full !rounded-xl"
                   >
                     {t.checkout}
                   </button>
@@ -473,6 +509,136 @@ export default function Header() {
           </div>
         </div>
       )}
-    </header>
+
+      {/* MOBILE NAVIGATION MENU DRAWER */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-50 flex">
+          {/* Backdrop Click Dismiss */}
+          <div
+            className="absolute inset-0 bg-brand-primary/40 backdrop-blur-xs transition-opacity"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+
+          <div
+            className="relative w-full max-w-[280px] h-full bg-white shadow-2xl flex flex-col z-10 border-r rtl:border-r-0 rtl:border-l border-brand-sage-light/15 animate-in slide-in-from-left rtl:slide-in-from-right duration-300"
+            style={{ backgroundColor: '#ffffff' }}
+          >
+            {/* Header */}
+            <div className="p-5 border-b border-brand-sage-light/20 flex items-center justify-between">
+              <span className="font-serif text-base font-bold text-brand-primary">
+                {language === 'en' ? 'AURA Navigation' : 'قائمة أورا'}
+              </span>
+              <button
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-zinc-400 hover:text-zinc-700 p-1.5 rounded-full hover:bg-brand-sage-light/10 cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Links */}
+            <div className="flex-1 overflow-y-auto p-5 space-y-3">
+              <button
+                onClick={() => {
+                  setActivePage('home');
+                  setIsMobileMenuOpen(false);
+                }}
+                className={`w-full text-start py-3 px-4 rounded-xl text-xs uppercase tracking-wider font-semibold transition-all duration-200 ${
+                  activePage === 'home' 
+                    ? 'bg-brand-primary text-brand-cream' 
+                    : 'text-brand-primary/75 hover:bg-brand-cream/40 hover:text-brand-primary'
+                }`}
+              >
+                {language === 'en' ? 'Home' : 'الرئيسية'}
+              </button>
+
+              <button
+                onClick={() => {
+                  setActivePage('shop');
+                  setIsMobileMenuOpen(false);
+                }}
+                className={`w-full text-start py-3 px-4 rounded-xl text-xs uppercase tracking-wider font-semibold transition-all duration-200 ${
+                  activePage === 'shop' 
+                    ? 'bg-brand-primary text-brand-cream' 
+                    : 'text-brand-primary/75 hover:bg-brand-cream/40 hover:text-brand-primary'
+                }`}
+              >
+                {language === 'en' ? 'Shop' : 'المتجر'}
+              </button>
+
+              <button
+                onClick={() => {
+                  setActivePage('bundles');
+                  setIsMobileMenuOpen(false);
+                }}
+                className={`w-full text-start py-3 px-4 rounded-xl text-xs uppercase tracking-wider font-semibold transition-all duration-200 ${
+                  activePage === 'bundles' 
+                    ? 'bg-brand-primary text-brand-cream' 
+                    : 'text-brand-primary/75 hover:bg-brand-cream/40 hover:text-brand-primary'
+                }`}
+              >
+                {language === 'en' ? 'Bundles' : 'الباقات'}
+              </button>
+
+
+              <button
+                onClick={() => {
+                  setActivePage('developer-specs');
+                  setIsMobileMenuOpen(false);
+                }}
+                className={`w-full text-start py-3 px-4 rounded-xl text-xs uppercase tracking-wider font-semibold transition-all duration-200 ${
+                  activePage === 'developer-specs' 
+                    ? 'bg-brand-primary text-brand-cream' 
+                    : 'text-brand-primary/75 hover:bg-brand-cream/40 hover:text-brand-primary'
+                }`}
+              >
+                {language === 'en' ? 'Specs' : 'المواصفات'}
+              </button>
+
+              <div className="h-[1px] bg-brand-sage-light/10 my-4" />
+
+              <button
+                onClick={() => {
+                  setActivePage('wishlist');
+                  setIsMobileMenuOpen(false);
+                }}
+                className={`w-full text-start py-3 px-4 rounded-xl text-xs uppercase tracking-wider font-semibold transition-all duration-200 flex items-center justify-between ${
+                  activePage === 'wishlist' 
+                    ? 'bg-brand-primary text-brand-cream' 
+                    : 'text-brand-primary/75 hover:bg-brand-cream/40 hover:text-brand-primary'
+                }`}
+              >
+                <span>{language === 'en' ? 'Wishlist' : 'المفضلة'}</span>
+                {wishlist.length > 0 && (
+                  <span className="bg-brand-secondary text-brand-cream text-[9px] w-4.5 h-4.5 rounded-full flex items-center justify-center font-bold">
+                    {wishlist.length}
+                  </span>
+                )}
+              </button>
+
+              <button
+                onClick={() => {
+                  setActivePage(user ? 'profile' : 'auth');
+                  setIsMobileMenuOpen(false);
+                }}
+                className={`w-full text-start py-3 px-4 rounded-xl text-xs uppercase tracking-wider font-semibold transition-all duration-200 ${
+                  activePage === 'profile' || activePage === 'auth' 
+                    ? 'bg-brand-primary text-brand-cream' 
+                    : 'text-brand-primary/75 hover:bg-brand-cream/40 hover:text-brand-primary'
+                }`}
+              >
+                {language === 'en' ? 'My Account' : 'حسابي'}
+              </button>
+            </div>
+
+            {/* Footer */}
+            <div className="p-5 border-t border-brand-sage-light/10 text-center text-[10px] text-zinc-400 font-sans">
+              <p>© {new Date().getFullYear()} AURA Laboratories.</p>
+              <p className="mt-1">{language === 'en' ? 'All rights reserved.' : 'جميع الحقوق محفوظة.'}</p>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

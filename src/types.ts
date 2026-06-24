@@ -91,7 +91,7 @@ export interface Order {
   id: string;
   orderNumber: string;
   date: string;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  status: 'pending' | 'processing' | 'shipped' | 'in-transit' | 'delivered' | 'returned' | 'cancelled';
   items: {
     productId: string;
     productNameEn: string;
@@ -120,3 +120,30 @@ export interface UserProfile {
   addresses: Address[];
   wishlist: string[]; // Product IDs
 }
+
+export interface BundleProduct {
+  product: Product;
+  stepEn: string;
+  stepAr: string;
+  benefitEn: string;
+  benefitAr: string;
+}
+
+export interface Bundle {
+  id: string;
+  slug: string;
+  nameEn: string;
+  nameAr: string;
+  subtitleEn: string;
+  subtitleAr: string;
+  descriptionEn: string;
+  descriptionAr: string;
+  image: string;
+  items: BundleProduct[];
+  discountPercentage: number;
+  originalPrice: number;
+  bundlePrice: number;
+  benefitsEn: string[];
+  benefitsAr: string[];
+}
+
