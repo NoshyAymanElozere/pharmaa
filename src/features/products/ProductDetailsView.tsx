@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useApp } from '../../store/AppContext';
+import { useApp, convertBundleToProduct } from '../../store/AppContext';
 import { PRODUCTS, BUNDLES } from '../../constants/data';
-import { Star, Heart, Plus, Minus, ShieldCheck, HelpCircle, ArrowRight, CornerDownLeft, Sparkles, Check, Info } from 'lucide-react';
+import { Star, Heart, Plus, Minus, ShieldCheck, HelpCircle, ArrowRight, CornerDownLeft, Sparkles, Check, Info, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Product } from '../../types';
 import ProductCard from '../../components/shared/ProductCard';
 import SectionTitle from '../../components/shared/SectionTitle';
@@ -21,15 +21,92 @@ export default function ProductDetailsView() {
     setActivePage
   } = useApp();
 
+  // Translations
+  const t = {
+    ratingLabelEn: 'Dermatologist Evaluated',
+    ratingLabelAr: 'تم التقييم من أطباء جلدية',
+    sizeLabelEn: 'Net Volume',
+    sizeLabelAr: 'الحجم الصافي',
+    stockInEn: 'In Stock • Ships Temperature Controlled',
+    stockInAr: 'متوفر • شحن مبرد طبيعي آمن',
+    buyNowEn: 'Instant Buy Now',
+    buyNowAr: 'شراء فوري سريع',
+    addToBagEn: 'Add Routine Bag',
+    addToBagAr: 'أضيفي للحقيبة التجميلية',
+    benefitsTitleEn: 'Clinical Benefits:',
+    benefitsTitleAr: 'الفوائد السريرية المثبتة:',
+    descriptionEn: 'Clinical Profile',
+    descriptionAr: 'الملف الطبي المعتمد',
+    ingredientsEn: 'Ingredients Spec',
+    ingredientsAr: 'المكونات بالتفصيل',
+    howToUseEn: 'Application Ritual',
+    howToUseAr: 'طقوس الاستخدام والجرعة',
+    shippingTabEn: 'Shipping & Returns',
+    shippingTabAr: 'الشحن الفاخر والضمان',
+    shippingDescEn: 'We dispatch all potions inside insulated white presentation boxes equipped with cooling cells. Hand-delivered across KSA and UAE doors within 3-4 working days. Aura offers free luxury exchanges on pristine items within 14 days.',
+    shippingDescAr: 'نقوم بشحن جميع المنتجات والجرعات بداخل صناديق بيضاء فاخرة معزولة ومجهزة بخلايا تبريد لحماية المواد. يتم التوصيل والتسليم لباب منزلكِ في غضون 3-4 أيام عمل. نوفر ميزة الاستبدال أو الاسترجاع الفاخر خلال 14 يوماً من الاستلام.',
+    bundleTitleEn: 'Frequently Bought Together',
+    bundleTitleAr: 'مجموعة التآزر المقترحة (الترطيب المتكامل)',
+    bundleSubEn: 'Activate maximum therapeutic skin repair with synergy. Save 10% on this complete selection.',
+    bundleSubAr: 'نشطي روتين العلاج والترميم الأقصى بتوفير 10٪ على هذا المستحضر والمكملات المتناسقة معه.',
+    addBundleBtnEn: 'Add Selection to Routine (Save 10%)',
+    addBundleBtnAr: 'أضيفي المجموعة للحقيبة (توفير 10٪)',
+    relatedTitleEn: 'You May Also Consult',
+    relatedTitleAr: 'منتجات أخرى قد تهمكِ أيضاً',
+    relatedSubtitleEn: 'Explore complementing elixirs in our pharmacy line.',
+    relatedSubtitleAr: 'استكشفي تركيبات تكميلية دقيقة لبشرة ممتازة.',
+    aed: language === 'en' ? 'AED/SAR' : 'ريال',
+    saveEn: 'Save',
+    saveAr: 'توفير'
+  };
+
+  const [activeTab, setActiveTab] = useState<'desc' | 'ingredients' | 'how' | 'shipping'>('desc');
+  const [activeBundleTab, setActiveBundleTab] = useState<'desc' | 'ingredients' | 'how' | 'shipping'>('desc');
+  const [activeImage, setActiveImage] = useState(selectedProduct?.image || '');
+  const [quantity, setQuantity] = useState(1);
+  const [isWished, setIsWished] = useState(selectedProduct ? wishlist.includes(selectedProduct.id) : false);
+
+  const [buyMatch1, setBuyMatch1] = useState(true);
+  const [buyMatch2, setBuyMatch2] = useState(false);
+
+  // Scroll to top on navigation/state changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  }, [selectedProduct?.id, selectedBundle?.id]);
+
+  useEffect(() => {
+    if (selectedProduct) {
+      setActiveImage(selectedProduct.image);
+      setQuantity(1);
+      setIsWished(wishlist.includes(selectedProduct.id));
+    }
+  }, [selectedProduct, wishlist]);
+
+  // Frequently bought together states
+  const bundleMatch1 = selectedProduct
+    ? (PRODUCTS.find((p) => p.id !== selectedProduct.id && p.categorySlug === 'serums') || PRODUCTS[0])
+    : PRODUCTS[0];
+  const bundleMatch2 = selectedProduct
+    ? (PRODUCTS.find((p) => p.id !== selectedProduct.id && p.id !== bundleMatch1.id && p.categorySlug === 'moisturizers') || PRODUCTS[1])
+    : PRODUCTS[1];
+
+  const matchingBundle = selectedProduct
+    ? (BUNDLES.find(b => b.items.some(item => item.product.id === selectedProduct.id)) || BUNDLES[0])
+    : BUNDLES[0];
+
+  const productBundles = selectedProduct
+    ? BUNDLES.filter(b => b.items.some(item => item.product.id === selectedProduct.id))
+    : [];
+
   // If a bundle is selected, show the premium Bundle details section
   if (selectedBundle) {
     const b = selectedBundle;
     const isWished = wishlist.includes(b.id);
-    
+
     const handleAddEntireBundle = () => {
-      b.items.forEach((item) => {
-        addToCart(item.product, item.product.size, 1);
-      });
+      addToCart(convertBundleToProduct(b), 'Complete Set', 1);
       setActivePage('cart');
     };
 
@@ -37,7 +114,7 @@ export default function ProductDetailsView() {
 
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-16 animate-fade-in">
-        
+
         {/* Breadcrumb Navigation */}
         <div className="flex items-center gap-1.5 text-[10px] tracking-widest font-semibold text-brand-sage-muted uppercase">
           <button onClick={() => setActivePage('home')} className="hover:text-brand-primary transition-colors cursor-pointer">
@@ -79,23 +156,6 @@ export default function ProductDetailsView() {
               {language === 'en' ? b.descriptionEn : b.descriptionAr}
             </p>
 
-            {/* Core Routine Benefits */}
-            <div className="space-y-3 pt-2">
-              <h4 className="input-label">
-                {language === 'en' ? 'Routine Outcomes:' : 'نتائج الروتين المتوقعة:'}
-              </h4>
-              <ul className="grid grid-cols-1 gap-2 font-sans">
-                {(language === 'en' ? b.benefitsEn : b.benefitsAr).map((benefit, idx) => (
-                  <li key={idx} className="flex items-start text-xs text-zinc-700 leading-relaxed">
-                    <span className="w-5 h-5 rounded-full bg-brand-sage-light/25 flex items-center justify-center mr-2.5 rtl:ml-2.5 flex-shrink-0 mt-0.5">
-                      <Check className="text-brand-primary" size={11} />
-                    </span>
-                    <span>{benefit}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
             {/* Pricing Summary Card */}
             <div className="bg-gradient-to-r from-brand-cream/80 to-brand-sage-light/10 p-6 rounded-2xl border border-brand-sage-light/20 space-y-4">
               <div className="flex justify-between items-center">
@@ -127,58 +187,103 @@ export default function ProductDetailsView() {
           </div>
         </div>
 
-        {/* Curated Steps Breakdown */}
+        {/* Tabbed Info Section (Matching Product Details design system) */}
+        <div className="card-base bg-white p-6 sm:p-10 !rounded-2xl">
+          {/* Buttons header */}
+          <div className="flex border-b border-brand-sage-light/10 pb-3 gap-6 sm:gap-10 overflow-x-auto scrollbar-none">
+            {[
+              { id: 'desc', labelEn: 'Description', labelAr: 'الوصف' },
+              { id: 'ingredients', labelEn: 'Ingredients Spec', labelAr: 'المكونات بالتفصيل' },
+              { id: 'how', labelEn: 'Application Ritual', labelAr: 'طقوس الاستخدام والجرعة' },
+              { id: 'shipping', labelEn: 'Shipping & Returns', labelAr: 'الشحن والضمان' }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveBundleTab(tab.id as any)}
+                className={`text-xs sm:text-sm font-semibold uppercase tracking-wider pb-3 border-b-2 cursor-pointer transition-all duration-300 whitespace-nowrap ${activeBundleTab === tab.id
+                  ? 'border-brand-primary text-brand-primary font-bold'
+                  : 'border-transparent text-zinc-400 hover:text-brand-primary'
+                  }`}
+              >
+                {language === 'en' ? tab.labelEn : tab.labelAr}
+              </button>
+            ))}
+          </div>
+
+          {/* Dynamic content rendering panel */}
+          <div className="text-zinc-650 text-xs sm:text-sm leading-relaxed font-sans max-w-4xl space-y-4 pt-8">
+            {activeBundleTab === 'desc' && (
+              <p>{language === 'en' ? b.descriptionEn : b.descriptionAr}</p>
+            )}
+
+            {activeBundleTab === 'ingredients' && (
+              <p className="whitespace-pre-line">
+                {language === 'en'
+                  ? b.items.map((item) => `${item.product.nameEn}: ${item.product.ingredientsEn}`).join('\n\n')
+                  : b.items.map((item) => `${item.product.nameAr}: ${item.product.ingredientsAr}`).join('\n\n')}
+              </p>
+            )}
+
+            {activeBundleTab === 'how' && (
+              <p className="whitespace-pre-line">
+                {language === 'en'
+                  ? b.items.map((item) => `${item.product.nameEn}: ${item.product.howToUseEn}`).join('\n\n')
+                  : b.items.map((item) => `${item.product.nameAr}: ${item.product.howToUseAr}`).join('\n\n')}
+              </p>
+            )}
+
+            {activeBundleTab === 'shipping' && (
+              <p>{language === 'en' ? t.shippingDescEn : t.shippingDescAr}</p>
+            )}
+          </div>
+        </div>
+
+        {/* Products In Target Bundle Section */}
         <div className="space-y-8 pt-8">
           <SectionTitle
-            subtitle={language === 'en' ? 'Step-by-Step Synergy' : 'خطوات الروتين المتكاملة'}
-            title={language === 'en' ? 'The Ritual Steps' : 'طقوس استخدام المجموعة'}
-            description={language === 'en' ? 'How these formulations coordinate to maximize therapeutic results.' : 'كيف تتكامل هذه المستحضرات معاً لضمان أفضل تغذية وحماية للبشرة.'}
+            subtitle={language === 'en' ? 'Included Formulations' : 'المستحضرات المشمولة في الباقة'}
+            title={language === 'en' ? 'Meet the Products' : 'المستحضرات المكونة للمجموعة'}
+            description={language === 'en' ? 'A detailed look at the premium clinical formulations configured in this bundle. Click any card to explore its detailed specs and ingredients.' : 'تفاصيل المستحضرات الطبية والسريرية المشمولة بهذه باقة العناية. اضغطي على أي مستحضر لمشاهدة التفاصيل بالكامل.'}
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {b.items.map((item, idx) => {
+            {b.items.map((item) => {
               const p = item.product;
               return (
-                <div key={p.id} className="card-elevated p-6 !rounded-2xl border border-brand-sage-light/10 space-y-4 flex flex-col justify-between">
-                  <div className="space-y-4">
-                    {/* Step tag */}
-                    <div className="flex justify-between items-center">
-                      <span className="badge badge-sage">
-                        {language === 'en' ? item.stepEn : item.stepAr}
-                      </span>
-                      <span className="text-[10px] text-zinc-400 font-sans">{p.size}</span>
-                    </div>
-
-                    {/* Product Image and Details */}
-                    <div className="flex space-x-3.5 rtl:space-x-reverse items-center pt-2">
-                      <img
-                        src={p.image}
-                        alt={p.nameEn}
-                        className="w-16 h-20 object-cover rounded-xl bg-brand-cream/50 p-0.5 border border-brand-sage-light/15"
-                      />
-                      <div>
-                        <h4 className="font-serif text-xs font-bold text-zinc-900 leading-snug">
-                          {language === 'en' ? p.nameEn : p.nameAr}
-                        </h4>
-                        <span className="text-[10px] text-zinc-500 font-sans">{p.discountPrice ?? p.price} {language === 'en' ? 'AED/SAR' : 'ريال'}</span>
-                      </div>
-                    </div>
-
-                    <p className="text-[11px] text-zinc-500 font-sans leading-relaxed">
-                      {language === 'en' ? item.benefitEn : item.benefitAr}
-                    </p>
+                <div
+                  key={p.id}
+                  onClick={() => setSelectedProduct(p)}
+                  className="card-elevated overflow-hidden group hover:scale-[1.01] hover:shadow-lg transition-all duration-300 border border-brand-sage-light/10 bg-white flex flex-col justify-between cursor-pointer"
+                >
+                  {/* Product Image */}
+                  <div className="relative h-48 overflow-hidden bg-brand-cream/30 p-2">
+                    <img
+                      src={p.image}
+                      alt={p.nameEn}
+                      className="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-500"
+                    />
                   </div>
 
-                  <div className="pt-3 border-t border-zinc-100 flex items-center justify-between">
-                    <button
-                      onClick={() => setSelectedProduct(p)}
-                      className="text-[10px] text-brand-primary hover:underline font-bold uppercase tracking-wider cursor-pointer font-sans"
-                    >
-                      {language === 'en' ? 'View Formulation' : 'تفاصيل المستحضر'}
-                    </button>
-                    <span className="text-[9px] text-emerald-600 font-bold uppercase tracking-widest font-sans">
-                      {language === 'en' ? 'In Stock' : 'متوفر'}
-                    </span>
+                  {/* Body Content */}
+                  <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                    <div className="space-y-2">
+                      <h4 className="font-serif text-sm font-bold text-brand-primary group-hover:text-brand-secondary transition-colors line-clamp-1">
+                        {language === 'en' ? p.nameEn : p.nameAr}
+                      </h4>
+                      <p className="text-zinc-500 text-xs font-sans line-clamp-3 leading-relaxed">
+                        {language === 'en' ? p.descriptionEn : p.descriptionAr}
+                      </p>
+                    </div>
+
+                    <div className="pt-3 border-t border-zinc-150 flex items-center justify-between text-[11px] font-sans">
+                      <span className="font-semibold text-brand-primary">
+                        {p.discountPrice ?? p.price} {language === 'en' ? 'AED/SAR' : 'ريال'}
+                      </span>
+                      <span className="text-brand-primary font-bold uppercase tracking-wider group-hover:underline flex items-center gap-1">
+                        {language === 'en' ? 'View Details' : 'عرض التفاصيل'}
+                        <ArrowRight size={12} className="rtl:rotate-180 transition-transform group-hover:translate-x-0.5" />
+                      </span>
+                    </div>
                   </div>
                 </div>
               );
@@ -205,25 +310,7 @@ export default function ProductDetailsView() {
     );
   }
 
-  const [activeTab, setActiveTab] = useState<'desc' | 'ingredients' | 'how' | 'shipping'>('desc');
-  const [activeImage, setActiveImage] = useState(selectedProduct.image);
-  const [quantity, setQuantity] = useState(1);
-  const [isWished, setIsWished] = useState(wishlist.includes(selectedProduct.id));
-
-  // Frequently bought together states
-  const bundleMatch1 = PRODUCTS.find((p) => p.id !== selectedProduct.id && p.categorySlug === 'serums') || PRODUCTS[0];
-  const bundleMatch2 = PRODUCTS.find((p) => p.id !== selectedProduct.id && p.id !== bundleMatch1.id && p.categorySlug === 'moisturizers') || PRODUCTS[1];
-
-  const matchingBundle = BUNDLES.find(b => b.items.some(item => item.product.id === selectedProduct.id)) || BUNDLES[0];
-
-  const [buyMatch1, setBuyMatch1] = useState(true);
-  const [buyMatch2, setBuyMatch2] = useState(false);
-
-  useEffect(() => {
-    setActiveImage(selectedProduct.image);
-    setQuantity(1);
-    setIsWished(wishlist.includes(selectedProduct.id));
-  }, [selectedProduct, wishlist]);
+  // Hooks migrated to top level to comply with rules of hooks
 
   const hasDiscount = selectedProduct.discountPrice !== undefined;
   const currentPrice = selectedProduct.discountPrice ?? selectedProduct.price;
@@ -259,51 +346,14 @@ export default function ProductDetailsView() {
     (p) => p.categorySlug === selectedProduct.categorySlug && p.id !== selectedProduct.id
   ).slice(0, 3);
 
-  // Translations
-  const t = {
-    ratingLabelEn: 'Dermatologist Evaluated',
-    ratingLabelAr: 'تم التقييم من أطباء جلدية',
-    sizeLabelEn: 'Net Volume',
-    sizeLabelAr: 'الحجم الصافي',
-    stockInEn: 'In Stock • Ships Temperature Controlled',
-    stockInAr: 'متوفر • شحن مبرد طبيعي آمن',
-    buyNowEn: 'Instant Buy Now',
-    buyNowAr: 'شراء فوري سريع',
-    addToBagEn: 'Add Routine Bag',
-    addToBagAr: 'أضيفي للحقيبة التجميلية',
-    benefitsTitleEn: 'Clinical Benefits:',
-    benefitsTitleAr: 'الفوائد السريرية المثبتة:',
-    descriptionEn: 'Clinical Profile',
-    descriptionAr: 'الملف الطبي المعتمد',
-    ingredientsEn: 'Ingredients Spec',
-    ingredientsAr: 'المكونات بالتفصيل',
-    howToUseEn: 'Application Ritual',
-    howToUseAr: 'طقوس الاستخدام والجرعة',
-    shippingTabEn: 'Shipping & Returns',
-    shippingTabAr: 'الشحن الفاخر والضمان',
-    shippingDescEn: 'We dispatch all potions inside insulated white presentation boxes equipped with cooling cells. Hand-delivered across KSA and UAE doors within 3-4 working days. Aura offers free luxury exchanges on pristine items within 14 days.',
-    shippingDescAr: 'نقوم بشحن جميع المنتجات والجرعات بداخل صناديق بيضاء فاخرة معزولة ومجهزة بخلايا تبريد لحماية المواد. يتم التوصيل والتسليم لباب منزلكِ في غضون 3-4 أيام عمل. نوفر ميزة الاستبدال أو الاسترجاع الفاخر خلال 14 يوماً من الاستلام.',
-    bundleTitleEn: 'Frequently Bought Together',
-    bundleTitleAr: 'مجموعة التآزر المقترحة (الترطيب المتكامل)',
-    bundleSubEn: 'Activate maximum therapeutic skin repair with synergy. Save 10% on this complete selection.',
-    bundleSubAr: 'نشطي روتين العلاج والترميم الأقصى بتوفير 10٪ على هذا المستحضر والمكملات المتناسقة معه.',
-    addBundleBtnEn: 'Add Selection to Routine (Save 10%)',
-    addBundleBtnAr: 'أضيفي المجموعة للحقيبة (توفير 10٪)',
-    relatedTitleEn: 'You May Also Consult',
-    relatedTitleAr: 'منتجات أخرى قد تهمكِ أيضاً',
-    relatedSubtitleEn: 'Explore complementing elixirs in our pharmacy line.',
-    relatedSubtitleAr: 'استكشفي تركيبات تكميلية دقيقة لبشرة ممتازة.',
-    aed: language === 'en' ? 'AED/SAR' : 'ريال',
-    saveEn: 'Save',
-    saveAr: 'توفير'
-  };
+  // Translations relocated to top-level context
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-16">
-      
+
       {/* Product Card Upper Half: Gallery + Info Details */}
       <div className="card-elevated grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 p-5 sm:p-8 lg:p-10 !rounded-2xl">
-        
+
         {/* LEFT COMPONENT: GALLERY SYSTEM */}
         <div className="lg:col-span-6 space-y-4 flex flex-col justify-start">
           {/* Large display screen */}
@@ -322,9 +372,8 @@ export default function ProductDetailsView() {
                 <button
                   key={idx}
                   onClick={() => setActiveImage(img)}
-                  className={`w-16 h-20 sm:w-18 sm:h-22 rounded-xl flex-shrink-0 overflow-hidden border-2 p-0.5 bg-white transition-all duration-300 cursor-pointer ${
-                    activeImage === img ? 'border-brand-primary shadow-md scale-105' : 'border-brand-sage-light/20 hover:border-brand-sage-muted hover:shadow-sm'
-                  }`}
+                  className={`w-16 h-20 sm:w-18 sm:h-22 rounded-xl flex-shrink-0 overflow-hidden border-2 p-0.5 bg-white transition-all duration-300 cursor-pointer ${activeImage === img ? 'border-brand-primary shadow-md scale-105' : 'border-brand-sage-light/20 hover:border-brand-sage-muted hover:shadow-sm'
+                    }`}
                 >
                   <img src={img} alt="Cosmetics thumbnail view" className="w-full h-full object-cover rounded-lg" />
                 </button>
@@ -365,10 +414,6 @@ export default function ProductDetailsView() {
                 ))}
               </div>
               <span className="text-xs font-semibold text-zinc-900 font-sans">{selectedProduct.rating}</span>
-              <span className="text-zinc-300">|</span>
-              <span className="text-xs text-zinc-500 font-sans">
-                {selectedProduct.reviewCount} {language === 'en' ? t.ratingLabelEn : t.ratingLabelAr}
-              </span>
             </div>
 
             {/* Price display card */}
@@ -406,11 +451,7 @@ export default function ProductDetailsView() {
               </div>
             </div>
 
-            {/* Stock and Temperature compliance tag */}
-            <span className="flex items-center space-x-2 rtl:space-x-reverse text-emerald-700 text-[10px] font-bold uppercase tracking-wider font-sans">
-              <span className="relative flex h-2.5 w-2.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span></span>
-              <span>{language === 'en' ? t.stockInEn : t.stockInAr}</span>
-            </span>
+
 
             {/* Key Clinical Benefits layout */}
             <div className="space-y-2 pt-2">
@@ -464,9 +505,8 @@ export default function ProductDetailsView() {
                   toggleWishlist(selectedProduct.id);
                   setIsWished(!isWished);
                 }}
-                className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
-                  isWished ? 'border-red-200 bg-red-50 text-red-500 shadow-sm' : 'border-brand-sage-light/20 text-brand-sage-muted hover:text-brand-primary hover:border-brand-sage-muted hover:bg-brand-cream/30'
-                }`}
+                className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 ${isWished ? 'border-red-200 bg-red-50 text-red-500 shadow-sm' : 'border-brand-sage-light/20 text-brand-sage-muted hover:text-brand-primary hover:border-brand-sage-muted hover:bg-brand-cream/30'
+                  }`}
                 aria-label="Wishlist Trigger"
               >
                 <Heart size={18} className={isWished ? 'fill-red-500' : ''} />
@@ -498,11 +538,10 @@ export default function ProductDetailsView() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`text-xs sm:text-sm font-semibold uppercase tracking-wider pb-3 border-b-2 cursor-pointer transition-all duration-300 whitespace-nowrap ${
-                activeTab === tab.id
-                  ? 'border-brand-primary text-brand-primary font-bold'
-                  : 'border-transparent text-zinc-400 hover:text-brand-primary'
-              }`}
+              className={`text-xs sm:text-sm font-semibold uppercase tracking-wider pb-3 border-b-2 cursor-pointer transition-all duration-300 whitespace-nowrap ${activeTab === tab.id
+                ? 'border-brand-primary text-brand-primary font-bold'
+                : 'border-transparent text-zinc-400 hover:text-brand-primary'
+                }`}
             >
               {language === 'en' ? tab.labelEn : tab.labelAr}
             </button>
@@ -512,65 +551,19 @@ export default function ProductDetailsView() {
         {/* Dynamic content rendering panel */}
         <div className="pt-8 text-zinc-650 text-xs sm:text-sm leading-relaxed font-sans max-w-4xl space-y-4">
           {activeTab === 'desc' && (
-            <div className="space-y-4">
-              <p>{language === 'en' ? selectedProduct.descriptionEn : selectedProduct.descriptionAr}</p>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-4 border-t border-zinc-100">
-                <div className="p-3.5 bg-brand-cream/40 rounded-xl">
-                  <span className="font-serif text-xs font-bold text-brand-primary block mb-0.5">Sustainably Sealed</span>
-                  <span className="text-[10px] text-zinc-500 font-sans block">Glass jars and recycled caps</span>
-                </div>
-                <div className="p-3.5 bg-brand-cream/40 rounded-xl">
-                  <span className="font-serif text-xs font-bold text-brand-primary block mb-0.5">Hypoallergenic</span>
-                  <span className="text-[10px] text-zinc-500 font-sans block">Clinically certified sensitive skin safe</span>
-                </div>
-                <div className="p-3.5 bg-brand-cream/40 rounded-xl">
-                  <span className="font-serif text-xs font-bold text-brand-primary block mb-0.5">Dermatological</span>
-                  <span className="text-[10px] text-zinc-500 font-sans block">No endocrine disruptors formulated</span>
-                </div>
-              </div>
-            </div>
+            <p>{language === 'en' ? selectedProduct.descriptionEn : selectedProduct.descriptionAr}</p>
           )}
 
           {activeTab === 'ingredients' && (
-            <div className="space-y-4">
-              <div className="p-4 bg-brand-cream rounded-2xl border border-brand-sage-light/20 flex items-start space-x-2.5 rtl:space-x-reverse">
-                <Info size={16} className="text-brand-sage-muted mt-0.5 flex-shrink-0" />
-                <span className="text-zinc-650 text-xs font-sans">
-                  {language === 'en'
-                    ? 'Our actives comply with absolute pharmaceutical cosmetic safety metrics. No chemical parabens, silicones, sulfates or synthetic perfumes used.'
-                    : 'جميع المكونات والتركيبات خاضعة للمراقبة الصحية والدوائية. خالية من البارابين والسليكون والسلفات والعطور الكيميائية المهيجة للبشرة.'}
-                </span>
-              </div>
-              <p className="font-serif font-bold text-sm text-brand-primary pt-2">{language === 'en' ? 'Core Actives Formula:' : 'قائمة المكونات النشطة بالكامل:'}</p>
-              <p className="font-mono text-zinc-500 leading-relaxed text-xs p-4 bg-zinc-50 rounded-xl border border-zinc-200/50">
-                {language === 'en' ? selectedProduct.ingredientsEn : selectedProduct.ingredientsAr}
-              </p>
-            </div>
+            <p>{language === 'en' ? selectedProduct.ingredientsEn : selectedProduct.ingredientsAr}</p>
           )}
 
           {activeTab === 'how' && (
-            <div className="space-y-2">
-              <p>{language === 'en' ? selectedProduct.howToUseEn : selectedProduct.howToUseAr}</p>
-              <div className="flex space-x-2 rtl:space-x-reverse pt-2 font-sans">
-                <span className="bg-zinc-100 rounded px-2.5 py-1 text-[11px] font-semibold text-zinc-650">Step 01: Purify</span>
-                <span className="bg-brand-sage-light/20 rounded px-2.5 py-1 text-[11px] font-semibold text-zinc-650">Step 02: Treat (This item)</span>
-                <span className="bg-zinc-100 rounded px-2.5 py-1 text-[11px] font-semibold text-zinc-650">Step 03: Protect</span>
-              </div>
-            </div>
+            <p>{language === 'en' ? selectedProduct.howToUseEn : selectedProduct.howToUseAr}</p>
           )}
+
           {activeTab === 'shipping' && (
-            <div className="space-y-4">
-              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-brand-sage-light/10 font-sans text-xs">
-                <li className="flex items-center text-zinc-650">
-                  <span className="w-5 h-5 rounded-full bg-brand-sage-light/10 flex items-center justify-center mr-2.5 rtl:ml-2.5 flex-shrink-0"><ShieldCheck className="text-brand-primary" size={12} /></span>
-                  <span>Saudi Arabia Express Deliveries: Riyadh, Jeddah, Dammam (24-48 hours)</span>
-                </li>
-                <li className="flex items-center text-zinc-650">
-                  <span className="w-5 h-5 rounded-full bg-brand-sage-light/10 flex items-center justify-center mr-2.5 rtl:ml-2.5 flex-shrink-0"><ShieldCheck className="text-brand-primary" size={12} /></span>
-                  <span>Emirates Delivery: Dubai, Abu Dhabi, Sharjah (48-72 hours)</span>
-                </li>
-              </ul>
-            </div>
+            <p>{language === 'en' ? t.shippingDescEn : t.shippingDescAr}</p>
           )}
         </div>
       </div>
@@ -667,133 +660,111 @@ export default function ProductDetailsView() {
       */}
 
       {/* Curated Routine Bundle Integration */}
-      {matchingBundle && (
-        <div className="bg-white border border-brand-sage-light/20 rounded-3xl p-6 sm:p-8 shadow-sm animate-fade-in">
-          {/* Section Header */}
-          <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-150/60 pb-4">
-            <div>
-              <span className="text-[10px] tracking-widest font-semibold uppercase text-brand-primary/70 block mb-1">
-                {language === 'en' ? 'Clinical Synergy Routine' : 'تآزر الروتين الطبي الموصى به'}
-              </span>
-              <h3 className="font-serif text-2xl font-bold text-brand-primary">
-                {language === 'en' ? 'Complete Your Daily Ritual' : 'أكملي طقوس العناية اليومية الخاصة بكِ'}
-              </h3>
-            </div>
-            <button
-              onClick={() => setSelectedBundle(matchingBundle)}
-              className="text-xs text-brand-primary font-bold uppercase tracking-wider hover:text-brand-secondary flex items-center gap-1 cursor-pointer font-sans w-fit transition-colors"
-            >
-              <span>{language === 'en' ? 'Learn More About This Routine' : 'تفاصيل هذا الروتين بالكامل'}</span>
-              <ArrowRight size={13} className="rtl:rotate-180" />
-            </button>
-          </div>
+      {productBundles.length > 0 && (
+        <div className="space-y-8 pt-8">
+          <SectionTitle
+            subtitle={language === 'en' ? 'Synergistic Systems' : 'باقات ترشيد الجرعات للتوفير'}
+            title={language === 'en' ? 'Featured Bundles Including This Product' : 'باقات متميزة تشمل هذا المستحضر'}
+            description={language === 'en' ? 'Activate therapeutic synergy and gain value benefits by buying this product as part of a grouped routine set.' : 'نشطي تآزر المكونات الطبي واحملي أقصى فائدة توفيرية عند اقتناء هذا المستحضر كجزء من روتينات العناية.'}
+          />
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-            {/* Left: Bundle Summary Card (Creative Dark Glass) */}
-            <div className="lg:col-span-4 bg-brand-primary text-brand-cream p-6 rounded-2xl flex flex-col justify-between space-y-6 shadow-sm relative overflow-hidden">
-              <div className="absolute top-0 right-0 -mt-8 -mr-8 w-24 h-24 rounded-full bg-brand-secondary/30 blur-2xl pointer-events-none" />
-              
-              <div className="space-y-3">
-                <span className="inline-block bg-red-650 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider text-white">
-                  -{matchingBundle.discountPercentage}% OFF
-                </span>
-                <h4 className="font-serif text-xl font-bold">
-                  {language === 'en' ? matchingBundle.nameEn : matchingBundle.nameAr}
-                </h4>
-                <p className="text-[11px] text-zinc-300 leading-relaxed font-sans">
-                  {language === 'en'
-                    ? 'Purchase this curated routine together to activate clinical ingredient synergy and save on the set.'
-                    : 'احصلي على هذا الروتين المنسق معاً لتنشيط التآزر الطبي للمكونات وتوفير سعر المجموعة.'}
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                <div className="border-t border-brand-secondary/30 pt-4 flex justify-between items-baseline font-sans">
-                  <span className="text-[10px] text-zinc-300 uppercase">{language === 'en' ? 'Total Price' : 'السعر الإجمالي'}</span>
-                  <div className="text-right flex flex-col items-end">
-                    <span className="text-[10px] text-zinc-400 line-through">
-                      {matchingBundle.originalPrice} {language === 'en' ? 'AED/SAR' : 'ريال'}
-                    </span>
-                    <span className="text-xl font-bold text-white">
-                      {matchingBundle.bundlePrice} {language === 'en' ? 'AED/SAR' : 'ريال'}
-                    </span>
-                  </div>
-                </div>
-
+          <div className="relative w-full">
+            {productBundles.length > 2 && (
+              <div className="flex justify-end gap-2 mb-3">
                 <button
                   onClick={() => {
-                    matchingBundle.items.forEach((item) => {
-                      addToCart(item.product, item.product.size, 1);
-                    });
-                    setActivePage('cart');
+                    const el = document.getElementById('product-bundles-slider');
+                    if (el) {
+                      el.scrollBy({ left: language === 'en' ? -340 : 340, behavior: 'smooth' });
+                    }
                   }}
-                  className="w-full bg-brand-cream hover:bg-white text-brand-primary active:scale-[0.98] transition-all rounded-xl py-3 text-xs uppercase tracking-wider font-bold text-center cursor-pointer shadow-sm font-sans"
+                  className="p-2 rounded-full border border-zinc-200 hover:border-brand-primary/40 hover:bg-zinc-50 text-zinc-650 transition-all cursor-pointer"
+                  aria-label="Previous"
                 >
-                  {language === 'en' ? 'Add Entire Routine' : 'أضيفي الروتين بالكامل للحقيبة'}
+                  <ChevronLeft size={16} className="rtl:rotate-180" />
+                </button>
+                <button
+                  onClick={() => {
+                    const el = document.getElementById('product-bundles-slider');
+                    if (el) {
+                      el.scrollBy({ left: language === 'en' ? 340 : -340, behavior: 'smooth' });
+                    }
+                  }}
+                  className="p-2 rounded-full border border-zinc-200 hover:border-brand-primary/40 hover:bg-zinc-50 text-zinc-650 transition-all cursor-pointer"
+                  aria-label="Next"
+                >
+                  <ChevronRight size={16} className="rtl:rotate-180" />
                 </button>
               </div>
-            </div>
+            )}
 
-            {/* Right: Step Cards Grid (Clickable) */}
-            <div className="lg:col-span-8 flex flex-col md:flex-row items-center justify-between gap-6 relative">
-              
-              {/* Step cards list */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full h-full">
-                {matchingBundle.items.map((item, index) => {
-                  const p = item.product;
-                  const isCurrent = p.id === selectedProduct.id;
-                  return (
-                    <div 
-                      key={p.id}
-                      onClick={() => {
-                        setSelectedProduct(p);
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                      }}
-                      className={`group relative bg-zinc-50 hover:bg-zinc-100/70 border rounded-2xl p-5 transition-all duration-300 cursor-pointer flex flex-col justify-between h-full hover:shadow-sm ${
-                        isCurrent 
-                          ? 'border-brand-primary/40 ring-1 ring-brand-primary/10 bg-brand-cream/10' 
-                          : 'border-zinc-200/60'
-                      }`}
-                    >
-                      {/* Step & Action Indicator */}
-                      <div className="flex justify-between items-center mb-3">
-                        <span className="bg-white border border-zinc-200 text-zinc-500 font-sans text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">
-                          {language === 'en' ? `Step 0${index + 1}` : `الخطوة 0${index + 1}`}
-                        </span>
-                        {isCurrent && (
-                          <span className="bg-brand-primary text-brand-cream text-[8px] font-bold px-2 py-0.5 rounded-full font-sans uppercase">
-                            {language === 'en' ? 'Active View' : 'المعروض حالياً'}
-                          </span>
-                        )}
+            <div
+              id="product-bundles-slider"
+              className="flex gap-6 overflow-x-auto snap-x snap-mandatory scrollbar-none pb-4 w-full"
+            >
+              {productBundles.map((bundle) => {
+                const savings = bundle.originalPrice - bundle.bundlePrice;
+                return (
+                  <div
+                    key={bundle.id}
+                    onClick={() => {
+                      setSelectedBundle(bundle);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="group border border-brand-sage-light/10 hover:border-brand-primary/20 bg-white hover:bg-zinc-50/50 rounded-2xl p-5 transition-all duration-300 cursor-pointer flex flex-col justify-between hover:shadow-md snap-start min-w-[280px] sm:min-w-[340px] max-w-[360px] flex-shrink-0 relative overflow-hidden"
+                  >
+                    <div className="absolute top-4 left-4 z-10 bg-red-650 text-white text-[9px] uppercase font-bold tracking-widest px-2.5 py-1 rounded-full shadow-sm">
+                      {language === 'en' ? `Save ${bundle.discountPercentage}%` : `وفر ${bundle.discountPercentage}%`}
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="relative aspect-[16/10] w-full rounded-xl overflow-hidden bg-brand-cream/30 p-1 border border-brand-sage-light/10">
+                        <img
+                          src={bundle.image}
+                          alt={bundle.nameEn}
+                          className="w-full h-full object-cover rounded-lg group-hover:scale-[1.02] transition-transform duration-500"
+                        />
                       </div>
-
-                      <div className="flex items-start gap-4 mb-4">
-                        <div className="w-14 h-16 rounded-lg overflow-hidden bg-white border border-zinc-100 p-0.5 flex-shrink-0 shadow-3xs group-hover:scale-105 transition-transform duration-300">
-                          <img src={p.image} alt={p.nameEn} className="w-full h-full object-cover rounded" />
-                        </div>
-                        <div className="min-w-0">
-                          <span className="text-[9px] text-brand-sage-muted font-bold block uppercase tracking-wider mb-1 font-sans">
-                            {language === 'en' ? item.stepEn.split(':')[1] || item.stepEn : item.stepAr.split(':')[1] || item.stepAr}
-                          </span>
-                          <h5 className="font-serif text-xs font-bold text-zinc-900 leading-snug group-hover:text-brand-primary transition-colors line-clamp-2">
-                            {language === 'en' ? p.nameEn : p.nameAr}
-                          </h5>
-                        </div>
-                      </div>
-
-                      {/* View Details Action Link */}
-                      <div className="border-t border-zinc-200/50 pt-3 flex items-center justify-between text-[10px] text-zinc-500 group-hover:text-brand-primary transition-colors font-sans">
-                        <span>{p.size}</span>
-                        <span className="font-bold uppercase tracking-wider flex items-center gap-1">
-                          {language === 'en' ? 'View Details' : 'عرض التفاصيل'}
-                          <ArrowRight size={10} className="rtl:rotate-180 group-hover:translate-x-0.5 transition-transform" />
-                        </span>
+                      <div className="space-y-1.5">
+                        <h4 className="font-serif text-sm sm:text-base font-bold text-brand-primary group-hover:text-brand-secondary transition-colors">
+                          {language === 'en' ? bundle.nameEn : bundle.nameAr}
+                        </h4>
+                        <p className="text-[11px] text-brand-sage-muted font-sans italic line-clamp-1">
+                          {language === 'en' ? bundle.subtitleEn : bundle.subtitleAr}
+                        </p>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
 
+                    <div className="border-t border-brand-sage-light/10 pt-4 mt-5 space-y-3">
+                      <div className="flex justify-between items-baseline">
+                        <div>
+                          <span className="text-[10px] text-zinc-400 line-through leading-none block mb-0.5 font-sans">
+                            {bundle.originalPrice} {language === 'en' ? 'AED/SAR' : 'ريال'}
+                          </span>
+                          <span className="text-sm font-bold text-brand-primary font-sans">
+                            {bundle.bundlePrice} {language === 'en' ? 'AED/SAR' : 'ريال'}
+                          </span>
+                        </div>
+                        <span className="text-[9px] text-emerald-800 font-bold bg-emerald-50 px-2 py-0.5 rounded-sm font-sans uppercase">
+                          {language === 'en' ? `You save ${savings} AED` : `وفرتِ ${savings} ريال`}
+                        </span>
+                      </div>
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedBundle(bundle);
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                        className="w-full btn-secondary !py-2.5 !rounded-xl text-center cursor-pointer text-[10px] flex items-center justify-center gap-1 font-sans font-bold uppercase tracking-wider transition-all"
+                      >
+                        <span>{language === 'en' ? 'Explore Routine' : 'اكتشفي الروتين'}</span>
+                        <ArrowRight size={11} className="rtl:rotate-180" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>

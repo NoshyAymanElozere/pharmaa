@@ -338,6 +338,19 @@ export const REVIEWS: Review[] = [
     productNameAr: 'منظف البريبايوتك هرموني نباتي',
     verified: true,
     helpfulCount: 11
+  },
+  {
+    id: 'rev_4',
+    author: 'Amina Al-Mansour',
+    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80',
+    rating: 5,
+    date: '2026-06-15',
+    commentEn: 'Combine the Botanical Cleanser with the Ocean Hyaluronic Serum. My acne-prone skin cleared out, clogged pores resolved, and hyperpigmentation faded. Truly medical grade luxury!',
+    commentAr: 'جمعت بين الغسول النباتي وسيروم الهيالورونيك، والنتيجة خرافية! صَفَت الحبوب من بشرتي وتلاشت التصبغات تماماً. فعلاً مستحضرات علاجية فاخرة!',
+    productNameEn: 'Prebiotic Botanical Gel Cleanser',
+    productNameAr: 'غسول الجل النباتي الحيوي المقوي للبشرة',
+    verified: true,
+    helpfulCount: 27
   }
 ];
 

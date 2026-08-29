@@ -216,7 +216,7 @@ export default function Header() {
             >
               <Menu size={18} />
             </button>
-            
+
             {/* Brand Logo */}
             <div className="cursor-pointer flex items-center animate-fade-in" onClick={() => setActivePage('home')}>
               <BrandLogo />
@@ -399,7 +399,9 @@ export default function Header() {
                         {language === 'en' ? item.product.nameEn : item.product.nameAr}
                       </p>
                       <p className="text-[11px] text-zinc-500 font-sans mt-0.5">
-                        {language === 'en' ? 'Size' : 'الحجم'}: {item.selectedSize}
+                        {item.selectedSize === 'Complete Set'
+                          ? (language === 'en' ? 'Complete Set' : 'المجموعة الكاملة')
+                          : `${language === 'en' ? 'Size' : 'الحجم'}: ${item.selectedSize}`}
                       </p>
 
                       <div className="flex items-center justify-between mt-3">
@@ -543,11 +545,10 @@ export default function Header() {
                   setActivePage('home');
                   setIsMobileMenuOpen(false);
                 }}
-                className={`w-full text-start py-3 px-4 rounded-xl text-xs uppercase tracking-wider font-semibold transition-all duration-200 ${
-                  activePage === 'home' 
-                    ? 'bg-brand-primary text-brand-cream' 
+                className={`w-full text-start py-3 px-4 rounded-xl text-xs uppercase tracking-wider font-semibold transition-all duration-200 ${activePage === 'home'
+                    ? 'bg-brand-primary text-brand-cream'
                     : 'text-brand-primary/75 hover:bg-brand-cream/40 hover:text-brand-primary'
-                }`}
+                  }`}
               >
                 {language === 'en' ? 'Home' : 'الرئيسية'}
               </button>
@@ -557,11 +558,10 @@ export default function Header() {
                   setActivePage('shop');
                   setIsMobileMenuOpen(false);
                 }}
-                className={`w-full text-start py-3 px-4 rounded-xl text-xs uppercase tracking-wider font-semibold transition-all duration-200 ${
-                  activePage === 'shop' 
-                    ? 'bg-brand-primary text-brand-cream' 
+                className={`w-full text-start py-3 px-4 rounded-xl text-xs uppercase tracking-wider font-semibold transition-all duration-200 ${activePage === 'shop'
+                    ? 'bg-brand-primary text-brand-cream'
                     : 'text-brand-primary/75 hover:bg-brand-cream/40 hover:text-brand-primary'
-                }`}
+                  }`}
               >
                 {language === 'en' ? 'Shop' : 'المتجر'}
               </button>
@@ -571,11 +571,10 @@ export default function Header() {
                   setActivePage('bundles');
                   setIsMobileMenuOpen(false);
                 }}
-                className={`w-full text-start py-3 px-4 rounded-xl text-xs uppercase tracking-wider font-semibold transition-all duration-200 ${
-                  activePage === 'bundles' 
-                    ? 'bg-brand-primary text-brand-cream' 
+                className={`w-full text-start py-3 px-4 rounded-xl text-xs uppercase tracking-wider font-semibold transition-all duration-200 ${activePage === 'bundles'
+                    ? 'bg-brand-primary text-brand-cream'
                     : 'text-brand-primary/75 hover:bg-brand-cream/40 hover:text-brand-primary'
-                }`}
+                  }`}
               >
                 {language === 'en' ? 'Bundles' : 'الباقات'}
               </button>
@@ -586,11 +585,10 @@ export default function Header() {
                   setActivePage('developer-specs');
                   setIsMobileMenuOpen(false);
                 }}
-                className={`w-full text-start py-3 px-4 rounded-xl text-xs uppercase tracking-wider font-semibold transition-all duration-200 ${
-                  activePage === 'developer-specs' 
-                    ? 'bg-brand-primary text-brand-cream' 
+                className={`w-full text-start py-3 px-4 rounded-xl text-xs uppercase tracking-wider font-semibold transition-all duration-200 ${activePage === 'developer-specs'
+                    ? 'bg-brand-primary text-brand-cream'
                     : 'text-brand-primary/75 hover:bg-brand-cream/40 hover:text-brand-primary'
-                }`}
+                  }`}
               >
                 {language === 'en' ? 'Specs' : 'المواصفات'}
               </button>
@@ -602,11 +600,10 @@ export default function Header() {
                   setActivePage('wishlist');
                   setIsMobileMenuOpen(false);
                 }}
-                className={`w-full text-start py-3 px-4 rounded-xl text-xs uppercase tracking-wider font-semibold transition-all duration-200 flex items-center justify-between ${
-                  activePage === 'wishlist' 
-                    ? 'bg-brand-primary text-brand-cream' 
+                className={`w-full text-start py-3 px-4 rounded-xl text-xs uppercase tracking-wider font-semibold transition-all duration-200 flex items-center justify-between ${activePage === 'wishlist'
+                    ? 'bg-brand-primary text-brand-cream'
                     : 'text-brand-primary/75 hover:bg-brand-cream/40 hover:text-brand-primary'
-                }`}
+                  }`}
               >
                 <span>{language === 'en' ? 'Wishlist' : 'المفضلة'}</span>
                 {wishlist.length > 0 && (
@@ -621,11 +618,10 @@ export default function Header() {
                   setActivePage(user ? 'profile' : 'auth');
                   setIsMobileMenuOpen(false);
                 }}
-                className={`w-full text-start py-3 px-4 rounded-xl text-xs uppercase tracking-wider font-semibold transition-all duration-200 ${
-                  activePage === 'profile' || activePage === 'auth' 
-                    ? 'bg-brand-primary text-brand-cream' 
+                className={`w-full text-start py-3 px-4 rounded-xl text-xs uppercase tracking-wider font-semibold transition-all duration-200 ${activePage === 'profile' || activePage === 'auth'
+                    ? 'bg-brand-primary text-brand-cream'
                     : 'text-brand-primary/75 hover:bg-brand-cream/40 hover:text-brand-primary'
-                }`}
+                  }`}
               >
                 {language === 'en' ? 'My Account' : 'حسابي'}
               </button>

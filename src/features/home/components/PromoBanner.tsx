@@ -66,7 +66,7 @@ export default function PromoBanner() {
           <img
             src="/assets/images/hero_skincare_banner_1781217525355.jpg"
             alt="Luxury cosmetic ritual items display"
-            className="w-full h-full object-cover mix-blend-luminosity hover:mix-blend-normal transition-all duration-700"
+            className="w-full h-full object-cover"
           />
         </div>
       </div>

@@ -162,7 +162,9 @@ export default function CartView() {
                       </h4>
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="badge badge-outline !py-1 !px-2.5 !text-[9px] font-sans font-bold uppercase">
-                          {language === 'en' ? 'Size' : 'الحجم'}: {item.selectedSize}
+                          {item.selectedSize === 'Complete Set'
+                            ? (language === 'en' ? 'Complete Set' : 'المجموعة الكاملة')
+                            : `${language === 'en' ? 'Size' : 'الحجم'}: ${item.selectedSize}`}
                         </span>
                         <span className="text-[10px] text-zinc-400 font-sans">
                           {unitPrice} {t.aed} / {language === 'en' ? 'unit' : 'وحدة'}
@@ -213,7 +215,7 @@ export default function CartView() {
 
         {/* Right Side: Promo input and receipt summary */}
         <div className="lg:col-span-4 space-y-6">
-          
+
           {/* Coupon Entry */}
           <div className="card-elevated bg-white p-6 !rounded-2xl border border-brand-sage-light/10 space-y-4">
             <h4 className="input-label font-bold text-xs">
@@ -276,7 +278,7 @@ export default function CartView() {
                 <span>{language === 'en' ? t.subtotalEn : t.subtotalAr}</span>
                 <span className="font-bold text-zinc-800">{currentSubtotal} {t.aed}</span>
               </div>
-              
+
               {appliedCoupon && (
                 <div className="flex justify-between text-red-600 font-medium animate-fade-in">
                   <span>{language === 'en' ? t.discountEn : t.discountAr} ({appliedCoupon.code})</span>

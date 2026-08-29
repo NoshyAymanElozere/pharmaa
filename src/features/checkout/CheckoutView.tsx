@@ -221,7 +221,7 @@ export default function CheckoutView() {
             </div>
           </div>
         </div>
-          
+
         <button
           onClick={() => {
             setActivePage('profile'); // Goes straight to profile orders page where tracking can be inspected live
@@ -249,7 +249,7 @@ export default function CheckoutView() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8 animate-fade-in">
-      
+
       {/* Page Title */}
       <div className="border-b border-brand-sage-light/12 pb-4">
         <h1 className="font-serif text-2xl sm:text-3xl font-bold text-brand-primary">
@@ -270,9 +270,8 @@ export default function CheckoutView() {
               <div className={`step-connector ${step >= item.s ? 'step-connector-active' : ''}`} />
             )}
             <div className="flex items-center space-x-2 rtl:space-x-reverse">
-              <span className={`w-7 h-7 rounded-full flex items-center justify-center border font-bold text-[10px] transition-all duration-300 ${
-                step >= item.s ? 'bg-brand-primary text-brand-cream border-brand-primary shadow-sm' : 'bg-brand-cream/30 border-brand-sage-light/20 text-brand-sage-muted'
-              }`}>
+              <span className={`w-7 h-7 rounded-full flex items-center justify-center border font-bold text-[10px] transition-all duration-300 ${step >= item.s ? 'bg-brand-primary text-brand-cream border-brand-primary shadow-sm' : 'bg-brand-cream/30 border-brand-sage-light/20 text-brand-sage-muted'
+                }`}>
                 {item.s}
               </span>
               <span className={`hidden md:inline ${step === item.s ? 'text-brand-primary font-bold' : 'text-brand-sage-muted'}`}>
@@ -284,10 +283,10 @@ export default function CheckoutView() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        
+
         {/* LEFT WORKSPACE: STEP DETAILS */}
         <div className="lg:col-span-8 card-base bg-white p-6 sm:p-8 !rounded-2xl space-y-6">
-          
+
           {formError && (
             <p className="p-3 bg-red-50 text-red-700 text-xs font-semibold font-sans rounded-xl border border-red-100 flex items-center animate-fade-up">
               <span>{formError}</span>
@@ -416,9 +415,8 @@ export default function CheckoutView() {
 
               <div className="space-y-3">
                 {/* CC input choose option */}
-                <label className={`flex items-start p-4 border rounded-2xl cursor-pointer transition-all ${
-                  paymentMethod === 'credit_card' ? 'border-brand-primary bg-brand-cream/15' : 'border-brand-sage-light/15 hover:bg-brand-cream/10'
-                }`}>
+                <label className={`flex items-start p-4 border rounded-2xl cursor-pointer transition-all ${paymentMethod === 'credit_card' ? 'border-brand-primary bg-brand-cream/15' : 'border-brand-sage-light/15 hover:bg-brand-cream/10'
+                  }`}>
                   <input
                     type="radio"
                     name="payOption"
@@ -428,7 +426,7 @@ export default function CheckoutView() {
                   />
                   <div className="flex-1">
                     <span className="font-bold text-brand-primary block">{language === 'en' ? t.payCCEn : t.payCCAr}</span>
-                    
+
                     {paymentMethod === 'credit_card' && (
                       <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3 outline-none border-t border-brand-sage-light/10 pt-4 animate-fade-in">
                         <div className="sm:col-span-3 space-y-1">
@@ -468,9 +466,8 @@ export default function CheckoutView() {
                 </label>
 
                 {/* COD option choose */}
-                <label className={`flex items-start p-4 border rounded-2xl cursor-pointer transition-all ${
-                  paymentMethod === 'cod' ? 'border-brand-primary bg-brand-cream/15' : 'border-brand-sage-light/15 hover:bg-brand-cream/10'
-                }`}>
+                <label className={`flex items-start p-4 border rounded-2xl cursor-pointer transition-all ${paymentMethod === 'cod' ? 'border-brand-primary bg-brand-cream/15' : 'border-brand-sage-light/15 hover:bg-brand-cream/10'
+                  }`}>
                   <input
                     type="radio"
                     name="payOption"
@@ -577,7 +574,9 @@ export default function CheckoutView() {
                   <img src={item.product.image} alt="" className="w-10 h-12 object-cover rounded bg-brand-cream/30 p-0.5 border border-brand-sage-light/10" />
                   <div className="flex-1 min-w-0 font-sans text-xs">
                     <h5 className="font-serif font-bold text-zinc-900 truncate m-0">{language === 'en' ? item.product.nameEn : item.product.nameAr}</h5>
-                    <span className="text-[10px] text-brand-sage-muted block mt-0.5">{item.quantity} x {item.selectedSize}</span>
+                    <span className="text-[10px] text-brand-sage-muted block mt-0.5">
+                      {item.quantity} x {item.selectedSize === 'Complete Set' ? (language === 'en' ? 'Complete Set' : 'المجموعة الكاملة') : item.selectedSize}
+                    </span>
                   </div>
                   <span className="text-xs font-bold text-brand-primary font-sans">
                     {(item.product.discountPrice ?? item.product.price) * item.quantity} {t.aed}
